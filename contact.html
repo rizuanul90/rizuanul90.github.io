@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rizuanul Haque — Contact</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .contact-links { display: grid; gap: 1rem; }
+  .contact-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    text-decoration: none;
+    transition: border-color var(--transition), transform var(--transition);
+  }
+  .contact-card:hover {
+    border-color: var(--accent);
+    transform: translateX(4px);
+    text-decoration: none;
+  }
+  .contact-card-icon {
+    width: 42px; height: 42px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .contact-card-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+  .contact-card-value {
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .contact-card-arrow { margin-left: auto; color: var(--muted); font-size: 0.9rem; transition: color var(--transition); }
+  .contact-card:hover .contact-card-arrow { color: var(--accent); }
+
+  /* Availability block */
+  .availability {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+  }
+  .avail-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent2);
+    margin-right: 0.5rem;
+    box-shadow: 0 0 6px var(--accent2);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .avail-status {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent2);
+    margin-bottom: 1.25rem;
+  }
+  .avail-title {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+  }
+  .avail-desc { font-size: 0.88rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+  .role-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+
+  .btn-full {
+    display: block;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--bg);
+    text-decoration: none;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    transition: opacity var(--transition), transform var(--transition);
+  }
+  .btn-full:hover { opacity: 0.85; text-decoration: none; transform: translateY(-1px); }
+
+  @media (max-width: 640px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="experience.html">Experience</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="contact.html" class="active">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<main class="page">
+  <p class="section-label">05 — Contact</p>
+  <h2>Get In Touch</h2>
+
+  <div class="contact-grid">
+    <div class="contact-links">
+      <a href="mailto:rizuanulhaque@gmail.com" class="contact-card">
+        <div class="contact-card-icon">✉️</div>
+        <div>
+          <div class="contact-card-label">Email</div>
+          <div class="contact-card-value">rizuanulhaque@gmail.com</div>
+        </div>
+        <span class="contact-card-arrow">→</span>
+      </a>
+
+      <a href="tel:+16467534879" class="contact-card">
+        <div class="contact-card-icon">📞</div>
+        <div>
+          <div class="contact-card-label">Phone</div>
+          <div class="contact-card-value">+1 (646) 753-4879</div>
+        </div>
+        <span class="contact-card-arrow">→</span>
+      </a>
+
+      <a href="https://www.linkedin.com/in/rizuanul-haque" target="_blank" class="contact-card">
+        <div class="contact-card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent)"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        </div>
+        <div>
+          <div class="contact-card-label">LinkedIn</div>
+          <div class="contact-card-value">rizuanul-haque</div>
+        </div>
+        <span class="contact-card-arrow">→</span>
+      </a>
+
+      <a href="https://github.com/" target="_blank" class="contact-card">
+        <div class="contact-card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color:var(--muted)"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+        </div>
+        <div>
+          <div class="contact-card-label">GitHub</div>
+          <div class="contact-card-value">View Repositories</div>
+        </div>
+        <span class="contact-card-arrow">→</span>
+      </a>
+
+      <div class="contact-card" style="cursor:default;">
+        <div class="contact-card-icon">📍</div>
+        <div>
+          <div class="contact-card-label">Location</div>
+          <div class="contact-card-value">New York, NY</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="availability">
+      <p class="avail-status"><span class="avail-dot"></span>Available for Opportunities</p>
+      <div class="avail-title">Open to New Roles</div>
+      <p class="avail-desc">
+        I'm actively seeking positions in cybersecurity and IT security where I can apply my QA background, security certifications, and hands-on lab experience to protect real systems.
+      </p>
+      <div class="role-tags">
+        <span class="tag green">SOC Analyst</span>
+        <span class="tag">Security Engineer</span>
+        <span class="tag">AppSec / QA Security</span>
+        <span class="tag">IT Security</span>
+        <span class="tag">Threat Analyst</span>
+      </div>
+      <a href="mailto:rizuanulhaque@gmail.com" class="btn-full">Send Me a Message →</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Cybersecurity Portfolio</p>
+</footer>
+<button class="scroll-top" id="scrollTop">↑</button>
+
+<script>
+  const btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>

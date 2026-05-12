@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Algorithm Lab – Rizuanul Haque</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --tag-bg: #1f3a5f;
+    --tag-text: #79c0ff;
+    --code-bg: #1c2128;
+    --step-active: #388bfd1a;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  nav {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+  }
+  .nav-sep { color: var(--border); font-size: 1.2rem; }
+  .nav-title { font-size: 0.85rem; color: var(--muted); }
+  .nav-links { margin-left: auto; display: flex; gap: 1.5rem; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 4rem 2rem 3rem;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .badge {
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    border: 1px solid #1f6feb;
+    letter-spacing: 0.04em;
+  }
+  .badge.green { background: #1a3328; color: #56d364; border-color: #3fb950; }
+  h1 {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+  h1 span { color: var(--accent); }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 0.4rem; }
+  .hero-desc {
+    font-size: 1.05rem;
+    color: #b1bac4;
+    max-width: 680px;
+    border-left: 3px solid var(--accent);
+    padding-left: 1.2rem;
+    font-weight: 300;
+  }
+
+  /* ── LAYOUT ── */
+  .layout {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  /* ── SIDEBAR TOC ── */
+  .toc {
+    position: sticky;
+    top: 72px;
+    font-size: 0.82rem;
+  }
+  .toc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+  .toc ol { list-style: none; }
+  .toc li { margin-bottom: 0.35rem; }
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    display: block;
+    padding: 4px 8px;
+    border-left: 2px solid transparent;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.2s;
+    line-height: 1.4;
+  }
+  .toc a:hover, .toc a.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--step-active);
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  .content section {
+    margin-bottom: 3rem;
+    scroll-margin-top: 72px;
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  p { color: #b1bac4; font-size: 0.95rem; margin-bottom: 0.8rem; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 1.25rem 0;
+    overflow: hidden;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f78166; }
+  .dot-y { background: #d29922; }
+  .dot-g { background: #3fb950; }
+  pre {
+    padding: 1.2rem;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+  .kw { color: #ff7b72; }
+  .str { color: #a5d6ff; }
+  .fn { color: #d2a8ff; }
+  .cm { color: #6e7681; font-style: italic; }
+  .var { color: #79c0ff; }
+  .op { color: #e6edf3; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border: 1px solid #1f6feb;
+    background: var(--tag-bg);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin: 1.25rem 0;
+    font-size: 0.9rem;
+    color: #a5c8f8;
+  }
+  .callout strong { color: var(--accent); display: block; margin-bottom: 0.3rem; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+  .callout.green { border-color: #3fb950; background: #1a3328; color: #7ee787; }
+  .callout.green strong { color: var(--accent2); }
+
+  /* ── SUMMARY CARD ── */
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+  .summary-card h3 { font-size: 0.9rem; color: var(--muted); font-weight: 500; margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+  .method-list { list-style: none; }
+  .method-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+  }
+  .method-list li:last-child { border-bottom: none; }
+  .method-name {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    min-width: 110px;
+  }
+  .method-desc { color: var(--muted); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 640px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">rizuanul_haque</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-title">python-lab</span>
+  <div class="nav-links">
+    <a href="https://www.linkedin.com/in/rizuanul-haque" target="_blank">LinkedIn</a>
+    <a href="https://github.com/" target="_blank">GitHub</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge-row">
+    <span class="badge">Python</span>
+    <span class="badge">File I/O</span>
+    <span class="badge">Algorithm</span>
+    <span class="badge green">✓ Completed</span>
+  </div>
+  <h1>Update a File Through a <span>Python Algorithm</span></h1>
+  <div class="hero-meta">
+    <span>🔐 Cybersecurity Lab</span>
+    <span>🛠 Google Cybersecurity Certificate</span>
+    <span>📂 File Management</span>
+  </div>
+  <p class="hero-desc">
+    Built a Python algorithm to automate updating an IP address allow list — reading, parsing, filtering, and rewriting a file to revoke access for removed addresses.
+  </p>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="toc">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#step1">01 — Open the file</a></li>
+      <li><a href="#step2">02 — Read contents</a></li>
+      <li><a href="#step3">03 — Convert to list</a></li>
+      <li><a href="#step4">04 — Iterate remove list</a></li>
+      <li><a href="#step5">05 — Remove addresses</a></li>
+      <li><a href="#step6">06 — Update the file</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ol>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <section id="overview">
+      <span class="section-num">// PROJECT OVERVIEW</span>
+      <h2>Project Description</h2>
+      <p>
+        At my organization, access to restricted content is controlled with an allow list of IP addresses stored in <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">allow_list.txt</code>. A separate remove list identifies IP addresses that should no longer have access.
+      </p>
+      <p>
+        I created an algorithm to automate updating the allow list file — removing any IP address that appears in the remove list, then rewriting the file with the revised set of approved addresses.
+      </p>
+      <div class="callout green">
+        <strong>// SECURITY CONTEXT</strong>
+        This automates a critical access-control operation, reducing human error and ensuring revoked IPs are removed promptly from the allow list.
+      </div>
+    </section>
+
+    <section id="step1">
+      <span class="section-num">// STEP 01</span>
+      <h2>Open the File that Contains the Allow List</h2>
+      <p>
+        First, I assigned the file name as a string to the <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">import_file</code> variable, then used a <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">with</code> statement to open it safely.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-lang">python</span>
+        </div>
+        <pre><span class="cm"># Assign the file name to a variable</span>
+<span class="var">import_file</span> <span class="op">=</span> <span class="str">"allow_list.txt"</span>
+
+<span class="cm"># Open the file using a with statement</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="var">import_file</span>, <span class="str">"r"</span>) <span class="kw">as</span> <span class="var">file</span>:
+    <span class="cm"># file operations go here</span>
+    <span class="kw">pass</span></pre>
+      </div>
+
+      <div class="callout">
+        <strong>// WHY with open()?</strong>
+        The <code style="font-family:'JetBrains Mono',monospace">with</code> statement automatically closes the file after the block exits — even if an error occurs — preventing resource leaks. The <code style="font-family:'JetBrains Mono',monospace">"r"</code> argument opens the file in read mode, and <code style="font-family:'JetBrains Mono',monospace">as file</code> stores the file object in the variable <code style="font-family:'JetBrains Mono',monospace">file</code>.
+      </div>
+    </section>
+
+    <section id="step2">
+      <span class="section-num">// STEP 02</span>
+      <h2>Read the File Contents</h2>
+      <p>
+        I used the <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">.read()</code> method inside the <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">with</code> block to convert the file's contents into a single string, storing it in <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">ip_addresses</code>.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-lang">python</span>
+        </div>
+        <pre><span class="kw">with</span> <span class="fn">open</span>(<span class="var">import_file</span>, <span class="str">"r"</span>) <span class="kw">as</span> <span class="var">file</span>:
+    <span class="cm"># Read file contents into a string</span>
+    <span class="var">ip_addresses</span> <span class="op">=</span> <span class="var">file</span>.<span class="fn">read</span>()</pre>
+      </div>
+
+      <p>
+        The <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">.read()</code> method converts the file into a string, making it accessible for further manipulation in Python — such as splitting into a list or searching for specific values.
+      </p>
+    </section>
+
+    <section id="step3">
+      <span class="section-num">// STEP 03</span>
+      <h2>Convert the String into a List</h2>
+      <p>
+        To remove individual IP addresses, I needed them in list format. I used the <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">.split()</code> method to convert the whitespace-separated string into a list.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-lang">python</span>
+        </div>
+        <pre><span class="cm"># Convert the string of IPs into a list</span>
+<span class="var">ip_addresses</span> <span class="op">=</span> <span class="var">ip_addresses</span>.<span class="fn">split</span>()
+
+<span class="cm"># Example result:</span>
+<span class="cm"># ["192.168.1.1", "10.0.0.5", "172.16.0.3", ...]</span></pre>
+      </div>
+
+      <div class="callout">
+        <strong>// HOW .split() WORKS</strong>
+        By default, <code style="font-family:'JetBrains Mono',monospace">.split()</code> splits on any whitespace (spaces, newlines, tabs) and removes empty strings. Each IP address in the file becomes its own list element, enabling direct item-by-item operations.
+      </div>
+    </section>
+
+    <section id="step4">
+      <span class="section-num">// STEP 04</span>
+      <h2>Iterate Through the Remove List</h2>
+      <p>
+        A key part of the algorithm involves iterating through the IP addresses in the remove list. I used a <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">for</code> loop to process each address one by one.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-lang">python</span>
+        </div>
+        <pre><span class="cm"># Iterate through each IP in the remove list</span>
+<span class="kw">for</span> <span class="var">element</span> <span class="kw">in</span> <span class="var">remove_list</span>:
+    <span class="cm"># Process each element ...</span>
+    <span class="kw">pass</span></pre>
+      </div>
+
+      <p>
+        The <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">for</code> loop assigns each value from <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">remove_list</code> to the loop variable <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">element</code> in turn, allowing the removal logic to run against every address that should be revoked.
+      </p>
+    </section>
+
+    <section id="step5">
+      <span class="section-num">// STEP 05</span>
+      <h2>Remove IP Addresses on the Remove List</h2>
+      <p>
+        Inside the loop, I added a conditional check before calling <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">.remove()</code> — this prevents an error if an address from the remove list isn't present in the allow list.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-lang">python</span>
+        </div>
+        <pre><span class="kw">for</span> <span class="var">element</span> <span class="kw">in</span> <span class="var">remove_list</span>:
+    <span class="cm"># Only remove if the IP exists in the allow list</span>
+    <span class="kw">if</span> <span class="var">element</span> <span class="kw">in</span> <span class="var">ip_addresses</span>:
+        <span class="var">ip_addresses</span>.<span class="fn">remove</span>(<span class="var">element</span>)</pre>
+      </div>
+
+      <div class="callout">
+        <strong>// WHY THE if CHECK?</strong>
+        Calling <code style="font-family:'JetBrains Mono',monospace">.remove()</code> on a value that doesn't exist in the list raises a <code style="font-family:'JetBrains Mono',monospace">ValueError</code>. The <code style="font-family:'JetBrains Mono',monospace">if element in ip_addresses</code> guard makes the algorithm resilient to mismatches between the two lists — a critical defensive pattern in production scripts.
+      </div>
+    </section>
+
+    <section id="step6">
+      <span class="section-num">// STEP 06</span>
+      <h2>Update the File with the Revised List</h2>
+      <p>
+        As the final step, I converted the updated list back into a string using <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">.join()</code>, then opened the file in write mode to overwrite it with the revised allow list.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-lang">python</span>
+        </div>
+        <pre><span class="cm"># Convert the updated list back to a newline-separated string</span>
+<span class="var">ip_addresses</span> <span class="op">=</span> <span class="str">"\n"</span>.<span class="fn">join</span>(<span class="var">ip_addresses</span>)
+
+<span class="cm"># Overwrite the file with the revised allow list</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="var">import_file</span>, <span class="str">"w"</span>) <span class="kw">as</span> <span class="var">file</span>:
+    <span class="var">file</span>.<span class="fn">write</span>(<span class="var">ip_addresses</span>)</pre>
+      </div>
+
+      <p>
+        The <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">"w"</code> mode opens the file for writing and replaces all existing content. Using <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">"\n".join()</code> ensures each IP address is placed on its own line, matching the original file format.
+      </p>
+    </section>
+
+    <section id="summary">
+      <span class="section-num">// SUMMARY</span>
+      <h2>Algorithm Summary</h2>
+      <p>
+        The complete algorithm opens <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">allow_list.txt</code>, reads and parses it into a list of IP addresses, removes any address also found in <code style="background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.82em;color:var(--accent)">remove_list</code>, and writes the updated list back to the file — revoking access for any unauthorized IP.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+          <span class="code-lang">python — full algorithm</span>
+        </div>
+        <pre><span class="cm"># Full algorithm: update_allow_list.py</span>
+
+<span class="var">import_file</span> <span class="op">=</span> <span class="str">"allow_list.txt"</span>
+
+<span class="cm"># Step 1 & 2: Open and read the file</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="var">import_file</span>, <span class="str">"r"</span>) <span class="kw">as</span> <span class="var">file</span>:
+    <span class="var">ip_addresses</span> <span class="op">=</span> <span class="var">file</span>.<span class="fn">read</span>()
+
+<span class="cm"># Step 3: Convert string to list</span>
+<span class="var">ip_addresses</span> <span class="op">=</span> <span class="var">ip_addresses</span>.<span class="fn">split</span>()
+
+<span class="cm"># Steps 4 & 5: Iterate and remove revoked IPs</span>
+<span class="kw">for</span> <span class="var">element</span> <span class="kw">in</span> <span class="var">remove_list</span>:
+    <span class="kw">if</span> <span class="var">element</span> <span class="kw">in</span> <span class="var">ip_addresses</span>:
+        <span class="var">ip_addresses</span>.<span class="fn">remove</span>(<span class="var">element</span>)
+
+<span class="cm"># Step 6: Convert back to string and overwrite the file</span>
+<span class="var">ip_addresses</span> <span class="op">=</span> <span class="str">"\n"</span>.<span class="fn">join</span>(<span class="var">ip_addresses</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="var">import_file</span>, <span class="str">"w"</span>) <span class="kw">as</span> <span class="var">file</span>:
+    <span class="var">file</span>.<span class="fn">write</span>(<span class="var">ip_addresses</span>)</pre>
+      </div>
+
+      <div class="summary-card" style="margin-top:1.5rem;">
+        <h3>// KEY METHODS USED</h3>
+        <ul class="method-list">
+          <li>
+            <span class="method-name">open(file, "r")</span>
+            <span class="method-desc">Opens the file in read mode inside a safe <code style="font-family:'JetBrains Mono',monospace;font-size:0.8em">with</code> block</span>
+          </li>
+          <li>
+            <span class="method-name">.read()</span>
+            <span class="method-desc">Reads entire file contents into a single string</span>
+          </li>
+          <li>
+            <span class="method-name">.split()</span>
+            <span class="method-desc">Converts whitespace-separated string into a list of IPs</span>
+          </li>
+          <li>
+            <span class="method-name">for … in</span>
+            <span class="method-desc">Iterates through every address in the remove list</span>
+          </li>
+          <li>
+            <span class="method-name">.remove()</span>
+            <span class="method-desc">Deletes a matching element from the list (guarded by <code style="font-family:'JetBrains Mono',monospace;font-size:0.8em">if in</code>)</span>
+          </li>
+          <li>
+            <span class="method-name">"\n".join()</span>
+            <span class="method-desc">Converts the list back to a newline-separated string</span>
+          </li>
+          <li>
+            <span class="method-name">open(file, "w")</span>
+            <span class="method-desc">Opens the file in write mode and overwrites it with the updated list</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="callout green" style="margin-top:1.5rem;">
+        <strong>// OUTCOME</strong>
+        The algorithm successfully automates IP access revocation — any address on the remove list is purged from <code style="font-family:'JetBrains Mono',monospace">allow_list.txt</code>, ensuring restricted content is no longer accessible to unauthorized parties.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <p>Rizuanul Haque &mdash; <a href="https://www.linkedin.com/in/rizuanul-haque" target="_blank">LinkedIn</a> &mdash; rizuanulhaque@gmail.com</p>
+</footer>
+
+<script>
+  const links = document.querySelectorAll('.toc a');
+  const sections = document.querySelectorAll('.content section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>

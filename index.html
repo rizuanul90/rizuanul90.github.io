@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rizuanul Haque — Cybersecurity Portfolio</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* ── HERO GRID ── */
+  .hero {
+    min-height: calc(100vh - 60px);
+    display: grid;
+    place-items: center;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  /* Animated grid lines background */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--faint) 1px, transparent 1px),
+      linear-gradient(90deg, var(--faint) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.4;
+    z-index: -1;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  }
+
+  /* Glow orbs */
+  .glow-1, .glow-2 {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    pointer-events: none;
+  }
+  .glow-1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,255,0.12) 0%, transparent 70%);
+    top: -100px; left: -100px;
+  }
+  .glow-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,255,157,0.08) 0%, transparent 70%);
+    bottom: -50px; right: -50px;
+  }
+
+  .hero-inner { text-align: center; max-width: 780px; padding: 2rem; }
+
+  .greeting {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent2);
+    letter-spacing: 0.15em;
+    margin-bottom: 1.25rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.1s forwards;
+  }
+
+  .hero-name {
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.25s forwards;
+  }
+  .hero-name span { color: var(--accent); }
+
+  .hero-role {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.4s forwards;
+  }
+
+  .hero-desc {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 auto 2rem;
+    line-height: 1.75;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.55s forwards;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.7s forwards;
+  }
+
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 10px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border: 1px solid var(--accent);
+    font-weight: 500;
+  }
+  .btn-primary:hover { opacity: 0.85; text-decoration: none; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; transform: translateY(-1px); }
+
+  .hero-socials {
+    display: flex;
+    gap: 1.25rem;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.85s forwards;
+  }
+  .social-link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 0.35rem;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all var(--transition);
+  }
+  .social-link:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 1s forwards;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1rem;
+    text-align: center;
+    transition: border-color var(--transition);
+  }
+  .stat-box:hover { border-color: var(--accent); }
+  .stat-num {
+    font-family: var(--font-head);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .stat-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .stats-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="experience.html">Experience</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+    <div class="hero-inner">
+      <p class="greeting">👋 Hi There, I'm</p>
+      <h1 class="hero-name">Rizuanul<br><span>Haque</span></h1>
+      <p class="hero-role">Security-Focused QA Engineer &nbsp;→&nbsp; Cybersecurity Professional</p>
+      <p class="hero-desc">
+        Transitioning from 4+ years in quality assurance into cybersecurity — bringing a 
+        "think like an attacker" mindset, hands-on lab experience, and a CompTIA Security+ 
+        certification to every challenge.
+      </p>
+      <div class="hero-btns">
+        <a href="projects.html" class="btn btn-primary">View Projects →</a>
+        <a href="about.html" class="btn btn-ghost">About Me</a>
+        <a href="contact.html" class="btn btn-ghost">Hire Me</a>
+      </div>
+      <div class="hero-socials">
+        <a href="https://www.linkedin.com/in/rizuanul-haque" target="_blank" class="social-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+        <a href="https://github.com/" target="_blank" class="social-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+          GitHub
+        </a>
+        <a href="mailto:rizuanulhaque@gmail.com" class="social-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </a>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-num">4+</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Google Certs</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">Sec+</div>
+          <div class="stat-label">CompTIA Certified</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Cybersecurity Portfolio</p>
+</footer>
+
+<button class="scroll-top" id="scrollTop">↑</button>
+
+<script>
+  // Theme toggle
+  const btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+  // Scroll to top
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
