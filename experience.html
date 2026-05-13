@@ -25,26 +25,9 @@
     border-radius: 3px 0 0 3px;
   }
   .exp-card:hover { border-color: var(--accent); transform: translateX(4px); }
-
-  .exp-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
-  }
+  .exp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
   .exp-title { font-family: var(--font-head); font-size: 1.05rem; font-weight: 700; }
-  .exp-date {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--accent2);
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    padding: 3px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-  }
+  .exp-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent2); background: var(--surface2); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
   .exp-company { font-size: 0.85rem; color: var(--accent); margin-bottom: 1rem; }
   .exp-bullets { list-style: none; padding: 0; }
   .exp-bullets li {
@@ -55,21 +38,10 @@
     margin-bottom: 0.5rem;
     line-height: 1.6;
   }
-  .exp-bullets li::before {
-    content: '▸';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-size: 0.7rem;
-    top: 0.15rem;
-  }
+  .exp-bullets li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); font-size: 0.7rem; top: 0.15rem; }
   .exp-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
 
-  .cert-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1rem;
-  }
+  .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
   .cert-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -84,16 +56,22 @@
   .cert-icon { font-size: 1.6rem; }
   .cert-name { font-family: var(--font-head); font-size: 0.9rem; font-weight: 700; margin-bottom: 0.2rem; }
   .cert-org { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); }
-  .cert-status {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    padding: 2px 8px;
-    border-radius: 20px;
-    margin-top: 0.3rem;
-    display: inline-block;
-  }
+  .cert-status { font-family: var(--font-mono); font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; margin-top: 0.3rem; display: inline-block; }
   .status-earned { background: #1a3328; color: var(--accent2); border: 1px solid var(--accent2); }
   .status-progress { background: #2a2a1a; color: #ffd700; border: 1px solid #ffd700; }
+
+  .training-card {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .training-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+  .training-title { font-family: var(--font-head); font-size: 1rem; font-weight: 700; }
+  .training-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent2); background: var(--surface2); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; }
+  .training-org { font-size: 0.85rem; color: var(--accent); margin-bottom: 0.75rem; }
+  .training-topics { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 </style>
 </head>
 <body>
@@ -117,45 +95,42 @@
   <p class="section-label">02 — Experience</p>
   <h2>Work History</h2>
 
-  <!-- VA -->
+  <!-- Veterans Affairs -->
   <div class="exp-card">
     <div class="exp-header">
-      <div class="exp-title">Security-Focused Quality Assurance Engineer</div>
+      <div class="exp-title">Quality Assurance Engineer</div>
       <span class="exp-date">Mar 2024 – Aug 2025</span>
     </div>
     <div class="exp-company">Veterans Affairs (Contract)</div>
     <ul class="exp-bullets">
-      <li>Acted as a "security gate" by logging, tracking, and prioritizing issue findings in Jira, ensuring 100% traceability for incident handoffs.</li>
-      <li>Executed backend integrity validation using complex SQL queries to ensure 99% data integrity across patient and high-value transaction data.</li>
-      <li>Developed 150+ automated REST API security checks with Rest-Assured, cutting vulnerability detection time by 40%.</li>
-      <li>Leveraged Generative AI to auto-generate edge-case attack scenarios and reduced triage time by 30% through defect clustering and root cause analysis.</li>
+      <li>Served as the final validation point before production releases by tracking defects, compliance issues, and system risks through Jira workflows.</li>
+      <li>Executed backend validation using complex SQL queries to verify consistency and accuracy across patient and transactional data.</li>
+      <li>Developed and maintained 150+ automated REST API validation tests using Rest-Assured, improving defect detection efficiency and reducing manual regression effort.</li>
+      <li>Used generative AI tools to help generate edge-case test scenarios and accelerate defect triage during testing.</li>
       <li>Conducted compliance testing (Section 508) with JAWS to ensure regulatory adherence and protect sensitive healthcare data.</li>
-      <li>Designed UI automation with Selenium + Java; collaborated in Agile/Scrum with DevOps teams to triage defects and resolve environment blockers.</li>
     </ul>
     <div class="exp-tags">
-      <span class="tag">Rest-Assured</span><span class="tag">SQL</span><span class="tag">Selenium</span>
-      <span class="tag">Jira / Xray</span><span class="tag">Section 508</span><span class="tag">GenAI</span>
-      <span class="tag green">Federal Healthcare</span>
+      <span class="tag">Rest-Assured</span><span class="tag">SQL</span><span class="tag">Jira</span>
+      <span class="tag">Section 508 / JAWS</span><span class="tag">GenAI</span><span class="tag green">Federal Healthcare</span>
     </div>
   </div>
 
   <!-- Estée Lauder -->
   <div class="exp-card">
     <div class="exp-header">
-      <div class="exp-title">Test Engineer (Security & Compliance)</div>
+      <div class="exp-title">Test Engineer</div>
       <span class="exp-date">Jan 2023 – Mar 2024</span>
     </div>
     <div class="exp-company">The Estée Lauder Companies Inc. (Contract)</div>
     <ul class="exp-bullets">
-      <li>Validated high-value payment workflows for e-commerce platforms serving 2M+ daily users, reducing potential fraud exposure by 25%.</li>
-      <li>Created and executed 250+ security-focused test cases, achieving 97% scenario coverage for sensitive transactions.</li>
-      <li>Performed backend validation with SQL to ensure 98% accuracy across 1M+ sensitive user transactions and payment-related data.</li>
-      <li>Executed "round-trip" testing for complex payment integrations (Adyen, Braintree), validating order statuses and financial data integrity.</li>
-      <li>Logged and tracked 180+ security findings in Jira, maintaining a 95% closure rate before system release.</li>
+      <li>Validated payment and checkout workflows for high-volume e-commerce platforms to ensure transaction accuracy.</li>
+      <li>Created and executed extensive test coverage for sensitive transaction workflows and edge-case scenarios.</li>
+      <li>Performed backend SQL validation to verify consistency and accuracy of customer and transactional data across integrated systems.</li>
+      <li>Logged, tracked, and prioritized defects and compliance-related issues in Jira, maintaining timely resolution of release-critical issues before production deployment.</li>
     </ul>
     <div class="exp-tags">
-      <span class="tag">Postman</span><span class="tag">SQL</span><span class="tag">Jira</span>
-      <span class="tag">Adyen / Braintree</span><span class="tag">E-Commerce</span><span class="tag orange">2M+ Daily Users</span>
+      <span class="tag">SQL</span><span class="tag">Jira</span><span class="tag">E-Commerce</span>
+      <span class="tag">Payment Workflows</span><span class="tag orange">High-Volume Platform</span>
     </div>
   </div>
 
@@ -167,39 +142,46 @@
     </div>
     <div class="exp-company">Wabtec Corporation (Contract)</div>
     <ul class="exp-bullets">
-      <li>Automated 100+ API tests to improve system stability and defense against unexpected payloads across distributed networks.</li>
-      <li>Leveraged Kafka to monitor and validate high-frequency data streams from industrial sensors, ensuring integrity of real-time message delivery.</li>
-      <li>Developed UI automation frameworks using Java, Selenium, Cucumber, and TestNG.</li>
-      <li>Contributed to CI/CD pipelines using GitLab to automate regression coverage and deployment checks.</li>
-      <li>Logged, triaged, and tracked 250+ vulnerabilities in Rally, reducing average resolution time by 20%.</li>
+      <li>Automated 100+ API tests to improve system stability, validation coverage, and handling of unexpected input scenarios across distributed systems.</li>
+      <li>Performed high-volume API testing using Postman and Swagger, and developed automation scripts with Rest-Assured.</li>
+      <li>Logged, triaged, and tracked 250+ defects and system issues in Rally, improving resolution turnaround through effective coordination with development teams.</li>
+      <li>Partnered with developers and business analysts to reproduce and retest defects, ensuring zero critical bugs reached production.</li>
     </ul>
     <div class="exp-tags">
-      <span class="tag">Kafka</span><span class="tag">Selenium</span><span class="tag">Rest-Assured</span>
-      <span class="tag">GitLab CI/CD</span><span class="tag">Docker</span><span class="tag">Kubernetes</span>
-    </div>
-  </div>
-
-  <!-- Costco -->
-  <div class="exp-card">
-    <div class="exp-header">
-      <div class="exp-title">QA Tester</div>
-      <span class="exp-date">Jun 2020 – Sep 2021</span>
-    </div>
-    <div class="exp-company">Costco Wholesale (Contract)</div>
-    <ul class="exp-bullets">
-      <li>Managed software evaluation for critical business units (Pharmacy, Optical) ensuring high-quality user experiences.</li>
-      <li>Analyzed requirements and user stories to identify "out-of-the-box" testing scenarios and acceptance criteria.</li>
-      <li>Performed manual positive and negative testing to identify hidden defects and improve application stability.</li>
-      <li>Facilitated User Acceptance Testing (UAT) and system-level validation with stakeholders.</li>
-    </ul>
-    <div class="exp-tags">
-      <span class="tag">Manual Testing</span><span class="tag">UAT</span><span class="tag">Regression</span>
+      <span class="tag">Postman</span><span class="tag">Swagger</span><span class="tag">Rest-Assured</span>
+      <span class="tag">Rally</span><span class="tag">Distributed Systems</span>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <p class="section-label">Certifications & Training</p>
+  <p class="section-label">Training</p>
+  <h2>Current Training</h2>
+
+  <div class="training-card">
+    <div class="training-header">
+      <div class="training-title">Advanced Cybersecurity Cohort</div>
+      <span class="training-date">Jan 2026 – Jun 2026</span>
+    </div>
+    <div class="training-org">NPower</div>
+    <div class="training-topics">
+      <span class="tag green">SOC Fundamentals</span>
+      <span class="tag green">Security Controls</span>
+      <span class="tag green">Threat Hunting</span>
+      <span class="tag green">Log Analysis</span>
+      <span class="tag green">System Hardening</span>
+      <span class="tag green">Incident Response</span>
+      <span class="tag green">Network Security</span>
+      <span class="tag green">Cyber Risk Mitigation</span>
+      <span class="tag green">Security Compliance</span>
+      <span class="tag green">Asset Protection</span>
+      <span class="tag green">Security Monitoring</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <p class="section-label">Certifications</p>
   <h2>Credentials</h2>
 
   <div class="cert-grid">
@@ -244,19 +226,11 @@
       </div>
     </div>
     <div class="cert-card">
-      <span class="cert-icon">⏳</span>
+      <span class="cert-icon">🏆</span>
       <div>
-        <div class="cert-name">Google IT Support</div>
-        <div class="cert-org">Google / Coursera</div>
-        <span class="cert-status status-progress">In Progress</span>
-      </div>
-    </div>
-    <div class="cert-card">
-      <span class="cert-icon">⏳</span>
-      <div>
-        <div class="cert-name">Advanced Cybersecurity Cohort</div>
-        <div class="cert-org">NPower · Jan–Jun 2026</div>
-        <span class="cert-status status-progress">In Progress</span>
+        <div class="cert-name">Postman Essential Training</div>
+        <div class="cert-org">LinkedIn Learning</div>
+        <span class="cert-status status-earned">✓ Earned</span>
       </div>
     </div>
     <div class="cert-card">
@@ -267,6 +241,14 @@
         <span class="cert-status status-earned">✓ Earned</span>
       </div>
     </div>
+    <div class="cert-card">
+      <span class="cert-icon">⏳</span>
+      <div>
+        <div class="cert-name">Google IT Support</div>
+        <div class="cert-org">Google / Coursera</div>
+        <span class="cert-status status-progress">In Progress</span>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -274,13 +256,9 @@
   <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Cybersecurity Portfolio</p>
 </footer>
 <button class="scroll-top" id="scrollTop">↑</button>
-
 <script>
   const btn = document.getElementById('themeBtn');
-  btn.addEventListener('click', () => {
-    document.body.classList.toggle('light');
-    btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
-  });
+  btn.addEventListener('click', () => { document.body.classList.toggle('light'); btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️'; });
   const st = document.getElementById('scrollTop');
   window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
   st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));

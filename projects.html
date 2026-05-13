@@ -6,76 +6,33 @@
 <title>Rizuanul Haque — Projects & Labs</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  .filter-row {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-  }
+  .filter-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
   .filter-btn {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    padding: 5px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all var(--transition);
-    letter-spacing: 0.04em;
+    font-family: var(--font-mono); font-size: 0.72rem; padding: 5px 14px;
+    border-radius: 20px; border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all var(--transition); letter-spacing: 0.04em;
   }
-  .filter-btn:hover, .filter-btn.active {
-    background: var(--accent);
-    color: var(--bg);
-    border-color: var(--accent);
-  }
+  .filter-btn:hover, .filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.25rem;
-  }
-
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
   .proj-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.5rem; display: flex; flex-direction: column;
     transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   }
-  .proj-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0,212,255,0.08);
-  }
-
+  .proj-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,212,255,0.08); }
   .proj-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
   .proj-icon { font-size: 1.6rem; }
-  .proj-status {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    padding: 3px 9px;
-    border-radius: 20px;
-  }
+  .proj-status { font-family: var(--font-mono); font-size: 0.65rem; padding: 3px 9px; border-radius: 20px; }
   .status-complete { background: #1a3328; color: var(--accent2); border: 1px solid var(--accent2); }
   .status-progress { background: #1f2a3a; color: var(--accent); border: 1px solid var(--accent); }
   .status-planned  { background: #2a2535; color: #c084fc; border: 1px solid #c084fc; }
-
   .proj-title { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
   .proj-desc { font-size: 0.83rem; color: var(--muted); line-height: 1.6; flex: 1; margin-bottom: 1rem; }
   .proj-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1rem; }
-
   .proj-link {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--accent);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    transition: gap var(--transition);
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.3rem; transition: gap var(--transition);
   }
   .proj-link:hover { gap: 0.5rem; text-decoration: none; }
   .proj-link.disabled { color: var(--muted); pointer-events: none; }
@@ -112,7 +69,6 @@
 
   <div class="projects-grid" id="projectsGrid">
 
-    <!-- Python Lab -->
     <div class="proj-card" data-cat="python cybersecurity">
       <div class="proj-header">
         <span class="proj-icon">🐍</span>
@@ -126,7 +82,6 @@
       <a href="python_algorithm_lab.html" class="proj-link">View Lab →</a>
     </div>
 
-    <!-- SQL Lab placeholder -->
     <div class="proj-card" data-cat="cybersecurity soc">
       <div class="proj-header">
         <span class="proj-icon">🔍</span>
@@ -140,35 +95,32 @@
       <span class="proj-link disabled">Coming Soon →</span>
     </div>
 
-    <!-- Linux permissions -->
     <div class="proj-card" data-cat="cybersecurity">
       <div class="proj-header">
         <span class="proj-icon">🐧</span>
         <span class="proj-status status-progress">In Progress</span>
       </div>
       <div class="proj-title">Linux File Permission Management</div>
-      <div class="proj-desc">Used Linux CLI tools to audit and harden file permissions across directories, ensuring least-privilege access principles were enforced.</div>
+      <div class="proj-desc">Used Linux CLI tools to audit and harden file permissions across directories, enforcing least-privilege access principles.</div>
       <div class="proj-tags">
-        <span class="tag">Linux</span><span class="tag">chmod/chown</span><span class="tag">Hardening</span>
+        <span class="tag">Linux</span><span class="tag">chmod/chown</span><span class="tag">System Hardening</span>
       </div>
       <span class="proj-link disabled">Coming Soon →</span>
     </div>
 
-    <!-- Incident response -->
     <div class="proj-card" data-cat="soc cybersecurity">
       <div class="proj-header">
         <span class="proj-icon">🚨</span>
         <span class="proj-status status-progress">In Progress</span>
       </div>
       <div class="proj-title">Incident Response — Security Incident Report</div>
-      <div class="proj-desc">Documented a simulated DDoS incident using NIST framework — identification, containment, eradication, and recovery phases with a formal report.</div>
+      <div class="proj-desc">Documented a simulated DDoS incident using the NIST framework — identification, containment, eradication, and recovery with a formal report.</div>
       <div class="proj-tags">
         <span class="tag">NIST</span><span class="tag">Incident Response</span><span class="tag">Wireshark</span>
       </div>
       <span class="proj-link disabled">Coming Soon →</span>
     </div>
 
-    <!-- API security -->
     <div class="proj-card" data-cat="api cybersecurity">
       <div class="proj-header">
         <span class="proj-icon">🔐</span>
@@ -182,7 +134,6 @@
       <span class="proj-link disabled">Coming Soon →</span>
     </div>
 
-    <!-- Splunk -->
     <div class="proj-card" data-cat="soc">
       <div class="proj-header">
         <span class="proj-icon">📊</span>
@@ -196,7 +147,6 @@
       <span class="proj-link disabled">Planned →</span>
     </div>
 
-    <!-- Nmap -->
     <div class="proj-card" data-cat="cybersecurity">
       <div class="proj-header">
         <span class="proj-icon">🌐</span>
@@ -210,7 +160,6 @@
       <span class="proj-link disabled">Planned →</span>
     </div>
 
-    <!-- Wireshark -->
     <div class="proj-card" data-cat="soc cybersecurity">
       <div class="proj-header">
         <span class="proj-icon">🦈</span>
@@ -231,20 +180,12 @@
   <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Cybersecurity Portfolio</p>
 </footer>
 <button class="scroll-top" id="scrollTop">↑</button>
-
 <script>
-  // Theme
   const btn = document.getElementById('themeBtn');
-  btn.addEventListener('click', () => {
-    document.body.classList.toggle('light');
-    btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
-  });
-  // Scroll top
+  btn.addEventListener('click', () => { document.body.classList.toggle('light'); btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️'; });
   const st = document.getElementById('scrollTop');
   window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
   st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-  // Filter
   const filters = document.querySelectorAll('.filter-btn');
   const cards = document.querySelectorAll('.proj-card');
   filters.forEach(f => {
@@ -252,10 +193,7 @@
       filters.forEach(x => x.classList.remove('active'));
       f.classList.add('active');
       const cat = f.dataset.filter;
-      cards.forEach(c => {
-        const cats = c.dataset.cat || '';
-        c.style.display = (cat === 'all' || cats.includes(cat)) ? '' : 'none';
-      });
+      cards.forEach(c => { c.style.display = (cat === 'all' || (c.dataset.cat || '').includes(cat)) ? '' : 'none'; });
     });
   });
 </script>
