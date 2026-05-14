@@ -44,6 +44,28 @@
     bottom: -50px; right: -50px;
   }
   .hero-inner { text-align: center; max-width: 800px; padding: 2rem; }
+
+  /* Profile photo */
+  .profile-photo-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.05s forwards;
+  }
+  .profile-photo {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 0 6px rgba(0,212,255,0.12), 0 0 40px rgba(0,212,255,0.2);
+    transition: box-shadow var(--transition), transform var(--transition);
+  }
+  .profile-photo:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 8px rgba(0,212,255,0.18), 0 0 60px rgba(0,212,255,0.3);
+  }
   .greeting {
     font-family: var(--font-mono);
     font-size: 0.85rem;
@@ -157,6 +179,9 @@
     <div class="glow-1"></div>
     <div class="glow-2"></div>
     <div class="hero-inner">
+      <div class="profile-photo-wrap">
+        <img src="profile.png" alt="Rizuanul Haque" class="profile-photo">
+      </div>
       <p class="greeting">👋 Hi There, I'm</p>
       <h1 class="hero-name">Rizuanul<br><span>Haque</span></h1>
       <p class="hero-role">IT Professional &nbsp;·&nbsp; QA Engineer &nbsp;→&nbsp; Cybersecurity Specialist</p>
