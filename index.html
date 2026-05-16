@@ -26,135 +26,74 @@
     z-index: -1;
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
   }
-  .glow-1, .glow-2 {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    z-index: -1;
-    pointer-events: none;
-  }
-  .glow-1 {
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(0,212,255,0.12) 0%, transparent 70%);
-    top: -100px; left: -100px;
-  }
-  .glow-2 {
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(0,255,157,0.08) 0%, transparent 70%);
-    bottom: -50px; right: -50px;
-  }
+  .glow-1, .glow-2 { position: absolute; border-radius: 50%; filter: blur(80px); z-index: -1; pointer-events: none; }
+  .glow-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,212,255,0.12) 0%, transparent 70%); top: -100px; left: -100px; }
+  .glow-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,255,157,0.08) 0%, transparent 70%); bottom: -50px; right: -50px; }
+
   .hero-inner { text-align: center; max-width: 800px; padding: 2rem; }
 
-  /* Profile photo */
-  .profile-photo-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    animation: fadeUp 0.6s ease 0.05s forwards;
-  }
-  .profile-photo {
-    width: 140px; height: 140px;
-    border-radius: 50%;
-    object-fit: cover;
-    object-position: center top;
-    border: 3px solid var(--accent);
-    box-shadow: 0 0 0 6px rgba(0,212,255,0.12), 0 0 40px rgba(0,212,255,0.2);
-    transition: box-shadow var(--transition), transform var(--transition);
-  }
-  .profile-photo:hover {
-    transform: scale(1.04);
-    box-shadow: 0 0 0 8px rgba(0,212,255,0.18), 0 0 60px rgba(0,212,255,0.3);
-  }
-  .greeting {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--accent2);
-    letter-spacing: 0.15em;
-    margin-bottom: 1.25rem;
-    opacity: 0;
-    animation: fadeUp 0.6s ease 0.1s forwards;
-  }
-  .hero-name {
-    font-size: clamp(3rem, 10vw, 6rem);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.04em;
-    margin-bottom: 0.5rem;
-    opacity: 0;
-    animation: fadeUp 0.6s ease 0.25s forwards;
-  }
+  .profile-photo-wrap { display: flex; justify-content: center; margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.6s ease 0.05s forwards; }
+  .profile-photo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; object-position: center top; border: 3px solid var(--accent); box-shadow: 0 0 0 6px rgba(0,212,255,0.12), 0 0 40px rgba(0,212,255,0.2); transition: box-shadow var(--transition), transform var(--transition); }
+  .profile-photo:hover { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(0,212,255,0.18), 0 0 60px rgba(0,212,255,0.3); }
+
+  .greeting { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent2); letter-spacing: 0.15em; margin-bottom: 1.25rem; opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards; }
+  .hero-name { font-size: clamp(3rem, 10vw, 6rem); font-weight: 800; line-height: 1; letter-spacing: -0.04em; margin-bottom: 0.5rem; opacity: 0; animation: fadeUp 0.6s ease 0.25s forwards; }
   .hero-name span { color: var(--accent); }
-  .hero-role {
-    font-family: var(--font-mono);
-    font-size: clamp(0.8rem, 2vw, 0.95rem);
-    color: var(--muted);
-    margin-bottom: 1.75rem;
-    opacity: 0;
-    animation: fadeUp 0.6s ease 0.4s forwards;
-  }
-  .hero-desc {
-    font-size: 1rem;
-    color: var(--muted);
-    max-width: 620px;
-    margin: 0 auto 2rem;
-    line-height: 1.75;
-    opacity: 0;
-    animation: fadeUp 0.6s ease 0.55s forwards;
-  }
-  .hero-btns {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 2.5rem;
-    opacity: 0;
-    animation: fadeUp 0.6s ease 0.7s forwards;
-  }
-  .btn {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    padding: 10px 22px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all var(--transition);
-    letter-spacing: 0.04em;
-    text-decoration: none;
-    display: inline-flex; align-items: center; gap: 0.4rem;
-  }
+
+  /* ── TYPING ANIMATION ── */
+  .hero-role { font-family: var(--font-mono); font-size: clamp(0.8rem, 2vw, 0.95rem); color: var(--muted); margin-bottom: 1.75rem; opacity: 0; animation: fadeUp 0.6s ease 0.4s forwards; min-height: 1.8em; }
+  .typed-text { color: var(--accent); }
+  .typed-cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); margin-left: 2px; vertical-align: middle; animation: blink 0.7s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .hero-desc { font-size: 1rem; color: var(--muted); max-width: 620px; margin: 0 auto 2rem; line-height: 1.75; opacity: 0; animation: fadeUp 0.6s ease 0.55s forwards; }
+  .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; opacity: 0; animation: fadeUp 0.6s ease 0.7s forwards; }
+  .btn { font-family: var(--font-mono); font-size: 0.8rem; padding: 10px 22px; border-radius: 6px; cursor: pointer; transition: all var(--transition); letter-spacing: 0.04em; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
   .btn-primary { background: var(--accent); color: var(--bg); border: 1px solid var(--accent); font-weight: 500; }
   .btn-primary:hover { opacity: 0.85; text-decoration: none; transform: translateY(-1px); }
   .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; transform: translateY(-1px); }
-  .hero-socials {
-    display: flex; gap: 1.25rem; justify-content: center;
-    opacity: 0; animation: fadeUp 0.6s ease 0.85s forwards;
-  }
-  .social-link {
-    font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-decoration: none;
-    display: flex; align-items: center; gap: 0.35rem;
-    padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px;
-    transition: all var(--transition);
-  }
+
+  .hero-socials { display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.6s ease 0.85s forwards; }
+  .social-link { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 0.35rem; padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; transition: all var(--transition); }
   .social-link:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
-  .stats-row {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
-    margin-top: 5rem; opacity: 0; animation: fadeUp 0.6s ease 1s forwards;
-  }
-  .stat-box {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1.25rem 1rem; text-align: center; transition: border-color var(--transition);
-  }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 4rem; opacity: 0; animation: fadeUp 0.6s ease 1s forwards; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1rem; text-align: center; transition: border-color var(--transition); }
   .stat-box:hover { border-color: var(--accent); }
   .stat-num { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 0.25rem; }
   .stat-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @media (max-width: 600px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-  }
+
+  /* ── CERT ROADMAP ── */
+  .roadmap-section { max-width: 860px; margin: 0 auto; padding: 4rem 2rem 5rem; position: relative; z-index: 1; border-top: 1px solid var(--border); }
+  .roadmap-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .roadmap-heading { font-family: var(--font-head); font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin-bottom: 2.5rem; letter-spacing: -0.02em; color: var(--text); }
+
+  .roadmap-track { display: flex; flex-direction: column; position: relative; }
+  .roadmap-track::before { content: ''; position: absolute; left: 20px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--border)); border-radius: 2px; }
+
+  .roadmap-item { display: flex; gap: 1.5rem; align-items: flex-start; padding-bottom: 1.5rem; }
+  .roadmap-dot { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; position: relative; z-index: 1; transition: transform var(--transition); }
+  .roadmap-item:hover .roadmap-dot { transform: scale(1.1); }
+  .dot-earned { background: var(--accent2); color: #0a0f1a; box-shadow: 0 0 0 4px rgba(0,255,157,0.15); font-weight: 700; }
+  .dot-progress { background: var(--accent); color: #0a0f1a; box-shadow: 0 0 0 4px rgba(0,212,255,0.15); animation: pulse-dot 2s infinite; font-weight: 700; }
+  .dot-planned { background: var(--surface2); border: 2px solid var(--border); color: var(--muted); }
+  @keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 4px rgba(0,212,255,0.15); } 50% { box-shadow: 0 0 0 10px rgba(0,212,255,0.04); } }
+
+  .roadmap-content { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; transition: border-color var(--transition); }
+  .roadmap-item:hover .roadmap-content { border-color: var(--accent); }
+  .roadmap-meta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.25rem; }
+  .roadmap-name { font-family: var(--font-head); font-size: 0.92rem; font-weight: 700; color: var(--text); }
+  .roadmap-badge { font-family: var(--font-mono); font-size: 0.63rem; padding: 2px 9px; border-radius: 20px; }
+  .badge-earned { background: #1a3328; color: var(--accent2); border: 1px solid var(--accent2); }
+  .badge-progress { background: #1e2a3a; color: var(--accent); border: 1px solid var(--accent); }
+  .badge-planned { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .roadmap-org { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .roadmap-progress-bar { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+  .roadmap-progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0; transition: width 1.2s ease; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 600px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -184,7 +123,11 @@
       </div>
       <p class="greeting">👋 Hi There, I'm</p>
       <h1 class="hero-name">Rizuanul<br><span>Haque</span></h1>
-      <p class="hero-role">IT Professional &nbsp;·&nbsp; QA Engineer &nbsp;→&nbsp; Cybersecurity Specialist</p>
+
+      <p class="hero-role">
+        <span class="typed-text" id="typedText"></span><span class="typed-cursor"></span>
+      </p>
+
       <p class="hero-desc">
         4+ years in quality assurance, API testing, and systems validation — now transitioning into cybersecurity with hands-on SOC training, vulnerability assessment, and a CompTIA Security+ certification. Passionate about security operations and infrastructure protection.
       </p>
@@ -212,25 +155,112 @@
         </a>
       </div>
       <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-num">4+</div>
-          <div class="stat-label">Years Experience</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num">Sec+</div>
-          <div class="stat-label">CompTIA Certified</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num">SOC</div>
-          <div class="stat-label">NPower Training</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num">3</div>
-          <div class="stat-label">Google Certs</div>
-        </div>
+        <div class="stat-box"><div class="stat-num">4+</div><div class="stat-label">Years Experience</div></div>
+        <div class="stat-box"><div class="stat-num">Sec+</div><div class="stat-label">CompTIA Certified</div></div>
+        <div class="stat-box"><div class="stat-num">SOC</div><div class="stat-label">NPower Training</div></div>
+        <div class="stat-box"><div class="stat-num">3</div><div class="stat-label">Google Certs</div></div>
       </div>
     </div>
   </section>
+
+  <!-- ── CERT ROADMAP ── -->
+  <div class="roadmap-section">
+    <p class="roadmap-label">// Certification Roadmap</p>
+    <h2 class="roadmap-heading">My Security Journey</h2>
+    <div class="roadmap-track" id="roadmapTrack">
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-earned">✓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">A.A.S. Computer Network Technology</span><span class="roadmap-badge badge-earned">✓ Earned</span></div>
+          <div class="roadmap-org">Borough of Manhattan Community College · 2018</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="100"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-earned">✓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">Agile Foundations</span><span class="roadmap-badge badge-earned">✓ Earned</span></div>
+          <div class="roadmap-org">LinkedIn Learning</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="100"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-earned">✓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">API Test Automation & Postman Essential Training</span><span class="roadmap-badge badge-earned">✓ Earned</span></div>
+          <div class="roadmap-org">LinkedIn Learning</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="100"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-earned">✓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">Java & Python Scripting</span><span class="roadmap-badge badge-earned">✓ Earned</span></div>
+          <div class="roadmap-org">LinkedIn Learning</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="100"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-earned">✓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">Google AI Essentials</span><span class="roadmap-badge badge-earned">✓ Earned</span></div>
+          <div class="roadmap-org">Google</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="100"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-earned">✓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">Google Cybersecurity Professional</span><span class="roadmap-badge badge-earned">✓ Earned</span></div>
+          <div class="roadmap-org">Google / Coursera</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="100"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-earned">✓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">CompTIA Security+</span><span class="roadmap-badge badge-earned">✓ Earned</span></div>
+          <div class="roadmap-org">CompTIA</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="100"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-progress">⚡</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">Advanced Cybersecurity Cohort</span><span class="roadmap-badge badge-progress">In Progress</span></div>
+          <div class="roadmap-org">NPower · Jan – Jun 2026</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="75"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-progress">⚡</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">Google IT Support Professional</span><span class="roadmap-badge badge-progress">In Progress</span></div>
+          <div class="roadmap-org">Google / Coursera</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="60"></div></div>
+        </div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot dot-planned">🎓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-meta"><span class="roadmap-name">B.A.S. Computer Science & Information Security</span><span class="roadmap-badge badge-planned">Expected Dec 2027</span></div>
+          <div class="roadmap-org">John Jay College of Criminal Justice, NY</div>
+          <div class="roadmap-progress-bar"><div class="roadmap-progress-fill" data-w="55"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </main>
 
 <footer>
@@ -239,14 +269,43 @@
 <button class="scroll-top" id="scrollTop">↑</button>
 
 <script>
+  // ── DARK/LIGHT MODE MEMORY ──
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light') document.body.classList.add('light');
   const btn = document.getElementById('themeBtn');
+  btn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
   btn.addEventListener('click', () => {
     document.body.classList.toggle('light');
-    btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+    const isLight = document.body.classList.contains('light');
+    btn.textContent = isLight ? '☀️' : '🌙';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
   });
+
+  // ── SCROLL TO TOP ──
   const st = document.getElementById('scrollTop');
   window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
   st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ── TYPING ANIMATION ──
+  const roles = ['SOC Analyst', 'Security Engineer', 'Threat Hunter', 'QA Security Engineer', 'Cybersecurity Specialist'];
+  let roleIndex = 0, charIndex = 0, isDeleting = false;
+  const typedEl = document.getElementById('typedText');
+  function type() {
+    const current = roles[roleIndex];
+    typedEl.textContent = isDeleting ? current.substring(0, charIndex - 1) : current.substring(0, charIndex + 1);
+    isDeleting ? charIndex-- : charIndex++;
+    let speed = isDeleting ? 60 : 100;
+    if (!isDeleting && charIndex === current.length) { speed = 1800; isDeleting = true; }
+    else if (isDeleting && charIndex === 0) { isDeleting = false; roleIndex = (roleIndex + 1) % roles.length; speed = 400; }
+    setTimeout(type, speed);
+  }
+  setTimeout(type, 1200);
+
+  // ── ROADMAP PROGRESS BARS ──
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.querySelectorAll('.roadmap-progress-fill').forEach(b => b.style.width = b.dataset.w + '%'); });
+  }, { threshold: 0.1 });
+  document.getElementById('roadmapTrack').querySelectorAll('.roadmap-item').forEach(item => obs.observe(item));
 </script>
 </body>
 </html>
