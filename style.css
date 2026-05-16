@@ -64,7 +64,6 @@ nav {
   height: 60px;
   display: flex;
   align-items: center;
-  gap: 1rem;
   backdrop-filter: blur(12px);
   transition: background var(--transition);
 }
@@ -76,13 +75,13 @@ nav {
   color: var(--accent);
   text-decoration: none;
   letter-spacing: -0.02em;
-  margin-right: 0.5rem;
 }
 
 .nav-links {
   display: flex;
   gap: 0.25rem;
   list-style: none;
+  margin-left: auto;
 }
 
 .nav-links a {
@@ -106,7 +105,7 @@ nav {
   border: 1px solid var(--border);
 }
 
-.nav-right { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; }
 
 .theme-btn {
   background: var(--surface);
