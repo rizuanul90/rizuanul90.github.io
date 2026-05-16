@@ -81,7 +81,11 @@ nav {
   display: flex;
   gap: 0.25rem;
   list-style: none;
-  margin-left: auto;
+  margin-left: auto !important;
+}
+
+.nav-logo {
+  margin-right: 0 !important;
 }
 
 .nav-links a {
