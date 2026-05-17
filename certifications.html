@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certifications — Rizuanul Haque</title>
+<meta name="description" content="Certifications and credentials earned by Rizuanul Haque in cybersecurity, IT, and software quality assurance.">
+<link rel="stylesheet" href="style.css">
+<style>
+  .cert-hero { padding: 4rem 2rem 3rem; max-width: 900px; margin: 0 auto; }
+  .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+
+  .cert-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.75rem; display: flex; flex-direction: column; align-items: center; text-align: center;
+    transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    position: relative; overflow: hidden;
+  }
+  .cert-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,212,255,0.08); }
+  .cert-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); opacity: 0; transition: opacity var(--transition); }
+  .cert-card:hover::before { opacity: 1; }
+
+  .cert-badge-img {
+    width: 120px; height: 120px; object-fit: contain; margin-bottom: 1.25rem;
+    filter: drop-shadow(0 4px 12px rgba(0,212,255,0.15));
+    transition: transform var(--transition), filter var(--transition);
+  }
+  .cert-card:hover .cert-badge-img { transform: scale(1.05); filter: drop-shadow(0 6px 20px rgba(0,212,255,0.25)); }
+
+  .cert-badge-placeholder {
+    width: 120px; height: 120px; border-radius: 50%; margin-bottom: 1.25rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; border: 2px solid var(--border); background: var(--surface2);
+  }
+
+  .cert-name { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--text); }
+  .cert-issuer { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); margin-bottom: 0.75rem; }
+  .cert-status-pill { font-family: var(--font-mono); font-size: 0.65rem; padding: 3px 10px; border-radius: 20px; margin-bottom: 1rem; }
+  .pill-earned { background: #1a3328; color: var(--accent2); border: 1px solid var(--accent2); }
+  .pill-progress { background: #1e2a3a; color: var(--accent); border: 1px solid var(--accent); }
+
+  .cert-link {
+    font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); text-decoration: none;
+    padding: 6px 16px; border: 1px solid var(--accent); border-radius: 20px;
+    transition: all var(--transition); margin-top: auto;
+  }
+  .cert-link:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
+  .cert-link.disabled { color: var(--muted); border-color: var(--border); pointer-events: none; }
+
+  .section-divider { max-width: 900px; margin: 0 auto 2rem; padding: 0 2rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="experience.html">Experience</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<div class="cert-hero page">
+  <p class="section-label">// Credentials</p>
+  <h2>Certifications & Badges</h2>
+  <p style="max-width:600px;">All certifications are verifiable on <a href="https://www.credly.com/users/rizuanul-haque" target="_blank">Credly</a>. Click any badge to verify or view the credential details.</p>
+</div>
+
+<div style="max-width:900px;margin:0 auto;padding:0 2rem 5rem;">
+
+  <p class="section-label" style="margin-bottom:1.25rem;">// Security</p>
+  <div class="cert-grid">
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder">🏆</div>
+      <div class="cert-name">CompTIA Security+</div>
+      <div class="cert-issuer">CompTIA</div>
+      <span class="cert-status-pill pill-earned">✓ Earned</span>
+      <a href="https://www.credly.com/users/rizuanul-haque" target="_blank" class="cert-link">Verify on Credly →</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder">🛡️</div>
+      <div class="cert-name">Google Cybersecurity Professional</div>
+      <div class="cert-issuer">Google / Coursera</div>
+      <span class="cert-status-pill pill-earned">✓ Earned</span>
+      <a href="https://www.credly.com/users/rizuanul-haque" target="_blank" class="cert-link">Verify on Credly →</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder">🤖</div>
+      <div class="cert-name">Google AI Essentials</div>
+      <div class="cert-issuer">Google</div>
+      <span class="cert-status-pill pill-earned">✓ Earned</span>
+      <a href="https://www.credly.com/users/rizuanul-haque" target="_blank" class="cert-link">Verify on Credly →</a>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+  <p class="section-label" style="margin-bottom:1.25rem;">// Development & Testing</p>
+  <div class="cert-grid">
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder">⚡</div>
+      <div class="cert-name">Agile Foundations</div>
+      <div class="cert-issuer">LinkedIn Learning</div>
+      <span class="cert-status-pill pill-earned">✓ Earned</span>
+      <a href="https://www.credly.com/users/rizuanul-haque" target="_blank" class="cert-link">Verify on Credly →</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder">🔌</div>
+      <div class="cert-name">API Test Automation</div>
+      <div class="cert-issuer">LinkedIn Learning</div>
+      <span class="cert-status-pill pill-earned">✓ Earned</span>
+      <a href="https://www.credly.com/users/rizuanul-haque" target="_blank" class="cert-link">Verify on Credly →</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder">📬</div>
+      <div class="cert-name">Postman Essential Training</div>
+      <div class="cert-issuer">LinkedIn Learning</div>
+      <span class="cert-status-pill pill-earned">✓ Earned</span>
+      <a href="https://www.credly.com/users/rizuanul-haque" target="_blank" class="cert-link">Verify on Credly →</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder">☕</div>
+      <div class="cert-name">Java & Python Scripting</div>
+      <div class="cert-issuer">LinkedIn Learning</div>
+      <span class="cert-status-pill pill-earned">✓ Earned</span>
+      <a href="https://www.credly.com/users/rizuanul-haque" target="_blank" class="cert-link">Verify on Credly →</a>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+  <p class="section-label" style="margin-bottom:1.25rem;">// In Progress</p>
+  <div class="cert-grid">
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder" style="border-color:var(--accent);animation:pulse-border 2s infinite;">🖥️</div>
+      <div class="cert-name">Google IT Support Professional</div>
+      <div class="cert-issuer">Google / Coursera</div>
+      <span class="cert-status-pill pill-progress">In Progress</span>
+      <span class="cert-link disabled">Coming Soon</span>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge-placeholder" style="border-color:var(--accent);animation:pulse-border 2s infinite;">🔐</div>
+      <div class="cert-name">Advanced Cybersecurity Cohort</div>
+      <div class="cert-issuer">NPower · Jan – Jun 2026</div>
+      <span class="cert-status-pill pill-progress">In Progress</span>
+      <span class="cert-link disabled">Coming Soon</span>
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+@keyframes pulse-border { 0%, 100% { border-color: var(--accent); box-shadow: 0 0 0 0 rgba(0,212,255,0.2); } 50% { border-color: var(--accent2); box-shadow: 0 0 0 6px rgba(0,212,255,0); } }
+</style>
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Cybersecurity Portfolio</p>
+</footer>
+<button class="scroll-top" id="scrollTop">↑</button>
+<script>
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light') document.body.classList.add('light');
+  const btn = document.getElementById('themeBtn');
+  btn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  btn.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    const isLight = document.body.classList.contains('light');
+    btn.textContent = isLight ? '☀️' : '🌙';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  });
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
