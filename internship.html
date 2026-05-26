@@ -4,106 +4,97 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Internship — The Cyber Ledger | Rizuanul Haque</title>
-<meta name="description" content="Network Security Internship at The Cyber Ledger — weekly tasks, skills learned, and progress by Rizuanul Haque.">
+<meta name="description" content="Network Security Internship at The Cyber Ledger — weekly tasks, deliverables, and progress by Rizuanul Haque.">
 <link rel="stylesheet" href="style.css">
 <style>
-  /* ── HERO BANNER ── */
-  .intern-hero {
-    position: relative; z-index: 1;
-    padding: 4rem 2rem 3rem;
-    max-width: 920px; margin: 0 auto;
-  }
+  .intern-hero { padding:4rem 2rem 2rem; max-width:920px; margin:0 auto; position:relative; z-index:1; }
+  .company-badge { display:inline-flex; align-items:center; gap:.75rem; background:var(--surface); border:1px solid rgba(0,212,255,.25); border-radius:30px; padding:8px 20px; margin-bottom:1.5rem; font-family:var(--font-mono); font-size:.75rem; color:var(--accent); box-shadow:0 0 24px rgba(0,212,255,.08); }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--accent2); box-shadow:0 0 8px var(--accent2); animation:pulse-dot 2s infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+  .intern-title { font-family:var(--font-head); font-size:clamp(2rem,5vw,3.2rem); font-weight:800; line-height:1.1; letter-spacing:-.02em; margin-bottom:1rem; }
+  .intern-title span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .intern-meta { display:flex; flex-wrap:wrap; gap:1.25rem; font-family:var(--font-mono); font-size:.73rem; color:var(--muted); margin-bottom:1.5rem; }
+  .intern-desc { font-size:.97rem; color:var(--muted); max-width:680px; border-left:3px solid var(--accent); padding-left:1.25rem; line-height:1.8; font-weight:300; }
 
-  .company-badge {
-    display: inline-flex; align-items: center; gap: 0.75rem;
-    background: var(--surface); border: 1px solid rgba(0,212,255,0.25);
-    border-radius: 30px; padding: 8px 18px; margin-bottom: 1.5rem;
-    font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent);
-    box-shadow: 0 0 20px rgba(0,212,255,0.08);
-  }
-  .company-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); box-shadow: 0 0 8px var(--accent2); animation: pulse-dot 2s infinite; }
-  @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-
-  .intern-title { font-family: var(--font-head); font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
-  .intern-title span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-
-  .intern-meta { display: flex; flex-wrap: wrap; gap: 1.25rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); margin-bottom: 1.5rem; }
-  .intern-meta span { display: flex; align-items: center; gap: 0.4rem; }
-
-  .intern-desc { font-size: 1rem; color: var(--muted); max-width: 680px; border-left: 3px solid var(--accent); padding-left: 1.25rem; line-height: 1.8; font-weight: 300; }
-
-  /* ── OVERVIEW CARDS ── */
-  .overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin: 2.5rem 0; max-width: 920px; margin-left: auto; margin-right: auto; padding: 0 2rem; }
-  .ov-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; text-align: center; transition: all var(--transition); position: relative; overflow: hidden; }
+  .overview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:1rem; max-width:920px; margin:2.5rem auto; padding:0 2rem; }
+  .ov-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; text-align:center; transition:all var(--transition); position:relative; overflow:hidden; }
   .ov-card::after { content:''; position:absolute; bottom:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transform:scaleX(0); transition:transform var(--transition); }
-  .ov-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,212,255,0.08); }
-  .ov-card:hover::after { transform: scaleX(1); }
-  .ov-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
-  .ov-num { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height: 1; margin-bottom: 0.25rem; }
-  .ov-lbl { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .ov-card:hover { border-color:rgba(0,212,255,.3); transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,212,255,.08); }
+  .ov-card:hover::after { transform:scaleX(1); }
+  .ov-icon { font-size:1.5rem; margin-bottom:.4rem; }
+  .ov-num { font-family:var(--font-head); font-size:1.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; margin-bottom:.25rem; }
+  .ov-lbl { font-family:var(--font-mono); font-size:.63rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
 
-  /* ── WEEKLY TASKS LAYOUT ── */
-  .weeks-container { max-width: 920px; margin: 0 auto; padding: 0 2rem 5rem; }
+  .intern-body { max-width:920px; margin:0 auto; padding:0 2rem 5rem; }
 
-  /* Week accordion card */
-  .week-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    margin-bottom: 1.25rem; overflow: hidden; transition: border-color var(--transition);
+  .week-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:1.5rem; overflow:hidden; transition:border-color var(--transition); }
+  .week-card.open { border-color:rgba(0,212,255,.35); box-shadow:0 4px 30px rgba(0,212,255,.07); }
+  .week-header { display:flex; align-items:center; gap:1.25rem; padding:1.25rem 1.5rem; cursor:pointer; transition:background var(--transition); user-select:none; }
+  .week-header:hover { background:rgba(0,212,255,.02); }
+  .week-num { font-family:var(--font-mono); font-size:.68rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; flex-shrink:0; }
+  .week-title { font-family:var(--font-head); font-size:.95rem; font-weight:700; color:var(--text); flex:1; }
+  .week-date { font-family:var(--font-mono); font-size:.67rem; color:var(--muted); white-space:nowrap; }
+  .week-status { font-family:var(--font-mono); font-size:.62rem; padding:3px 10px; border-radius:20px; flex-shrink:0; }
+  .ws-active { background:rgba(0,212,255,.08); color:var(--accent); border:1px solid rgba(0,212,255,.3); animation:pulse-border 2.5s infinite; }
+  .ws-upcoming { background:var(--surface2); color:var(--muted); border:1px solid var(--border); }
+  @keyframes pulse-border { 0%,100%{border-color:rgba(0,212,255,.3);} 50%{border-color:rgba(0,212,255,.7);} }
+  .week-chevron { color:var(--muted); font-size:.75rem; transition:transform var(--transition); flex-shrink:0; }
+  .week-card.open .week-chevron { transform:rotate(180deg); color:var(--accent); }
+  .week-body { display:none; border-top:1px solid var(--border); }
+  .week-card.open .week-body { display:block; }
+  .week-inner { padding:1.75rem; }
+
+  .topic-banner { background:rgba(0,212,255,.05); border:1px solid rgba(0,212,255,.15); border-radius:10px; padding:1.25rem 1.5rem; margin-bottom:1.75rem; }
+  .topic-label { font-family:var(--font-mono); font-size:.65rem; color:var(--accent); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.4rem; }
+  .topic-title { font-family:var(--font-head); font-size:1.05rem; font-weight:800; color:var(--text); margin-bottom:.4rem; }
+  .topic-desc { font-size:.85rem; color:var(--muted); line-height:1.7; }
+
+  .section-head { font-family:var(--font-mono); font-size:.68rem; color:var(--accent); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.85rem; display:flex; align-items:center; gap:.5rem; }
+  .section-head::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .deliverables-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin-bottom:1.75rem; }
+  .deliv-item { display:flex; align-items:flex-start; gap:.75rem; padding:.7rem .9rem; background:var(--surface2); border:1px solid var(--border); border-radius:8px; transition:all var(--transition); }
+  .deliv-item:hover { border-color:rgba(0,212,255,.2); }
+  .deliv-check { width:18px; height:18px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.65rem; margin-top:1px; }
+  .dc-done { background:rgba(0,255,157,.12); border:1px solid rgba(0,255,157,.3); color:var(--accent2); }
+  .dc-pending { background:var(--surface); border:1px solid var(--border); color:var(--muted); }
+  .deliv-text { font-size:.82rem; color:var(--muted); line-height:1.5; }
+  .deliv-text strong { color:var(--text); display:block; font-size:.78rem; margin-bottom:.1rem; }
+
+  .breakdown-list { list-style:none; margin-bottom:1.75rem; }
+  .breakdown-item { display:flex; gap:1.1rem; padding:.85rem 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+  .breakdown-item:last-child { border-bottom:none; }
+  .bd-num { font-family:var(--font-mono); font-size:.7rem; color:var(--accent); background:rgba(0,212,255,.08); border:1px solid rgba(0,212,255,.2); border-radius:6px; padding:2px 8px; flex-shrink:0; margin-top:2px; }
+  .bd-title { font-family:var(--font-head); font-size:.88rem; font-weight:700; color:var(--text); margin-bottom:.25rem; }
+  .bd-desc { font-size:.82rem; color:var(--muted); line-height:1.6; }
+  .bd-risk { font-family:var(--font-mono); font-size:.67rem; color:var(--accent3); background:rgba(255,107,53,.06); border:1px solid rgba(255,107,53,.15); border-radius:4px; padding:2px 8px; margin-top:.4rem; display:inline-block; }
+
+  .resources-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-bottom:1.75rem; }
+  .resource-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:.9rem 1.1rem; display:flex; align-items:flex-start; gap:.75rem; transition:all var(--transition); text-decoration:none; }
+  .resource-card:hover { border-color:rgba(0,212,255,.3); background:rgba(0,212,255,.04); text-decoration:none; }
+  .rc-icon { font-size:1.2rem; flex-shrink:0; }
+  .rc-name { font-family:var(--font-head); font-size:.82rem; font-weight:700; color:var(--text); margin-bottom:.15rem; }
+  .rc-sub { font-family:var(--font-mono); font-size:.65rem; color:var(--accent); }
+  .rc-status { font-family:var(--font-mono); font-size:.62rem; padding:2px 8px; border-radius:20px; margin-top:.3rem; display:inline-block; }
+  .rcs-pending { background:var(--surface); color:var(--muted); border:1px solid var(--border); }
+
+  .mindset-grid { display:grid; gap:.75rem; margin-bottom:1.75rem; }
+  .mindset-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:1.1rem 1.25rem; transition:all var(--transition); position:relative; overflow:hidden; }
+  .mindset-card::before { content:''; position:absolute; left:0;top:0;bottom:0; width:3px; background:linear-gradient(to bottom,var(--accent),var(--accent2)); opacity:.6; }
+  .mindset-card:hover { border-color:rgba(0,212,255,.25); }
+  .mindset-num { font-family:var(--font-mono); font-size:.65rem; color:var(--accent); letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem; }
+  .mindset-title { font-family:var(--font-head); font-size:.9rem; font-weight:700; color:var(--text); margin-bottom:.4rem; }
+  .mindset-desc { font-size:.82rem; color:var(--muted); line-height:1.65; }
+
+  .skills-row { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.5rem; }
+
+  .upcoming-card { background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius); padding:2rem; text-align:center; margin-bottom:1.25rem; }
+  .upcoming-card p { font-family:var(--font-mono); font-size:.8rem; color:var(--muted); }
+
+  @media(max-width:640px){
+    .deliverables-grid,.resources-grid { grid-template-columns:1fr; }
+    .week-date { display:none; }
   }
-  .week-card:hover { border-color: rgba(0,212,255,0.3); }
-  .week-card.active { border-color: rgba(0,212,255,0.4); box-shadow: 0 4px 30px rgba(0,212,255,0.08); }
-
-  .week-header {
-    display: flex; align-items: center; gap: 1.25rem;
-    padding: 1.25rem 1.5rem; cursor: pointer;
-    transition: background var(--transition);
-  }
-  .week-header:hover { background: rgba(0,212,255,0.03); }
-
-  .week-num {
-    font-family: var(--font-mono); font-size: 0.7rem;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
-  }
-  .week-title { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; color: var(--text); flex: 1; }
-  .week-date { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
-  .week-status { font-family: var(--font-mono); font-size: 0.62rem; padding: 3px 10px; border-radius: 20px; flex-shrink: 0; }
-  .ws-complete { background: rgba(0,255,157,0.08); color: var(--accent2); border: 1px solid rgba(0,255,157,0.25); }
-  .ws-active { background: rgba(0,212,255,0.08); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); animation: pulse-border 2s infinite; }
-  .ws-upcoming { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-  @keyframes pulse-border { 0%,100%{border-color:rgba(0,212,255,0.25);} 50%{border-color:rgba(0,212,255,0.6);} }
-
-  .week-chevron { color: var(--muted); font-size: 0.8rem; transition: transform var(--transition); flex-shrink: 0; }
-  .week-card.active .week-chevron { transform: rotate(180deg); color: var(--accent); }
-
-  .week-body { display: none; padding: 0 1.5rem 1.5rem; border-top: 1px solid var(--border); }
-  .week-card.active .week-body { display: block; }
-
-  /* Task items */
-  .task-list { list-style: none; margin: 1.25rem 0; }
-  .task-item { display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
-  .task-item:last-child { border-bottom: none; }
-  .task-check { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; margin-top: 2px; }
-  .tc-done { background: rgba(0,255,157,0.1); border: 1px solid rgba(0,255,157,0.3); color: var(--accent2); }
-  .tc-pending { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
-  .task-text { font-size: 0.88rem; color: var(--muted); line-height: 1.6; flex: 1; }
-  .task-text strong { color: var(--text); }
-
-  /* Skills learned tags */
-  .skills-learned { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-  .skills-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.6rem; }
-  .skills-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-
-  /* Notes */
-  .week-notes { background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.15); border-radius: 8px; padding: 1rem 1.25rem; margin-top: 1rem; font-size: 0.87rem; color: var(--muted); line-height: 1.7; }
-  .week-notes strong { color: var(--accent); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; }
-
-  /* Upcoming placeholder */
-  .upcoming-card { background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; margin-bottom: 1.25rem; }
-  .upcoming-card p { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
-
-  @media(max-width:640px){ .week-date{display:none;} }
 </style>
 </head>
 <body>
@@ -117,124 +108,127 @@
     <li><a href="projects.html">Projects</a></li>
     <li><a href="skills.html">Skills</a></li>
     <li><a href="contact.html">Contact</a></li>
+    <li><a href="internship.html" class="active">Internship</a></li>
   </ul>
   <div class="nav-right"><button class="theme-btn" id="themeBtn">🌙</button></div>
 </nav>
 
-<!-- HERO -->
 <div class="intern-hero">
-  <div class="company-badge">
-    <span class="company-dot"></span>
-    Currently Active · Network Security Internship
-  </div>
-  <h1 class="intern-title">The <span>Cyber Ledger</span></h1>
+  <div class="company-badge"><span class="live-dot"></span>Currently Active · Part-Time · 2026</div>
+  <h1 class="intern-title">Network Security Intern<br><span>The Cyber Ledger</span></h1>
   <div class="intern-meta">
     <span>🏢 The Cyber Ledger</span>
     <span>🔐 Network Security</span>
     <span>📅 2026</span>
+    <span>🗓 Part-Time · Few Days/Week</span>
     <span>📍 New York, NY</span>
   </div>
-  <p class="intern-desc">
-    Hands-on network security internship covering real-world SOC workflows, threat analysis, network monitoring, and security infrastructure. This page is updated weekly as I complete each assignment and training task.
-  </p>
+  <p class="intern-desc">Hands-on network security internship at The Cyber Ledger — a cybersecurity firm that bridges offensive expertise with defensive strategy. Each week covers real-world SOC workflows, threat analysis, packet analysis, and security infrastructure. This page is updated weekly as I complete each assignment.</p>
 </div>
 
-<!-- OVERVIEW STATS -->
 <div class="overview-grid">
-  <div class="ov-card"><div class="ov-icon">📅</div><div class="ov-num" id="weeksCount">1</div><div class="ov-lbl">Weeks Completed</div></div>
-  <div class="ov-card"><div class="ov-icon">✅</div><div class="ov-num" id="tasksCount">0</div><div class="ov-lbl">Tasks Done</div></div>
-  <div class="ov-card"><div class="ov-icon">🛠</div><div class="ov-num" id="toolsCount">0</div><div class="ov-lbl">Tools Used</div></div>
+  <div class="ov-card"><div class="ov-icon">📅</div><div class="ov-num">1</div><div class="ov-lbl">Week Active</div></div>
+  <div class="ov-card"><div class="ov-icon">✅</div><div class="ov-num">2</div><div class="ov-lbl">Deliverables Done</div></div>
+  <div class="ov-card"><div class="ov-icon">🛠</div><div class="ov-num">5</div><div class="ov-lbl">Resources Used</div></div>
   <div class="ov-card"><div class="ov-icon">🔐</div><div class="ov-num">Net</div><div class="ov-lbl">Security Focus</div></div>
+  <div class="ov-card"><div class="ov-icon">🎯</div><div class="ov-num">SOC</div><div class="ov-lbl">Career Track</div></div>
 </div>
 
-<!-- WEEKLY TASKS -->
-<div class="weeks-container">
+<div class="intern-body">
   <p class="section-label" style="margin-bottom:1.5rem;">// Weekly Progress</p>
 
-  <!-- ═══ WEEK 1 — Update this section each week ═══ -->
-  <div class="week-card active" id="week1">
+  <!-- WEEK 1 -->
+  <div class="week-card open" id="week1">
     <div class="week-header" onclick="toggleWeek('week1')">
       <span class="week-num">// Week 01</span>
-      <span class="week-title">Onboarding & Introduction to Network Security</span>
-      <span class="week-date">Add your date here</span>
-      <span class="week-status ws-active">Active</span>
+      <span class="week-title">How a Packet Travels from Browser to Server</span>
+      <span class="week-date">2026</span>
+      <span class="week-status ws-active">In Progress</span>
       <span class="week-chevron">▼</span>
     </div>
     <div class="week-body">
-      <ul class="task-list">
-        <li class="task-item">
-          <span class="task-check tc-done">✓</span>
-          <span class="task-text"><strong>Task 1:</strong> Add your first task here — e.g. "Completed onboarding orientation and reviewed company security policies"</span>
-        </li>
-        <li class="task-item">
-          <span class="task-check tc-pending">○</span>
-          <span class="task-text"><strong>Task 2:</strong> Add your next task here — e.g. "Set up VPN access and configured workstation security settings"</span>
-        </li>
-      </ul>
+      <div class="week-inner">
 
-      <div class="week-notes">
-        <strong>// Notes & Reflections</strong>
-        Add your personal notes, observations, or key takeaways from this week here.
-      </div>
-
-      <div class="skills-learned">
-        <div class="skills-label">Skills & Tools Used This Week</div>
-        <div class="skills-tags">
-          <span class="tag">Network Security</span>
-          <span class="tag green">Add your tools here</span>
+        <div class="topic-banner">
+          <div class="topic-label">// Presentation Topic</div>
+          <div class="topic-title">"How a Packet Travels from Browser to Server"</div>
+          <div class="topic-desc">Explain the complete lifecycle of a web request from URL entry to page render — covering DNS resolution, TCP handshake, TLS/HTTPS negotiation, HTTP request/response flow, routing, and packet movement. Must address security risks at each stage from both attacker and defender perspectives.</div>
         </div>
+
+        <div class="section-head">// Required Deliverables</div>
+        <div class="deliverables-grid">
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>9–12 Min Video Presentation</strong>Recorded video covering full packet journey with practical demo and defender mindset</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>3–4 Page Learning Task Report</strong>Written in own words — practical observations, resource notes, defender mindset reflection</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-pending">○</span><div class="deliv-text"><strong>Practical Demonstration</strong>Browser Dev Tools, Wireshark, Cisco Packet Tracer, or Code.org Internet Simulator</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-pending">○</span><div class="deliv-text"><strong>Technical Breakdown of Packet Travel</strong>DNS → TCP → TLS → HTTP → Routing → Browser Render</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-pending">○</span><div class="deliv-text"><strong>Security Risk Explanation</strong>DNS spoofing, MITM, ARP spoofing, TLS downgrade, session hijacking</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-pending">○</span><div class="deliv-text"><strong>Detection + Mitigation</strong>DNS monitoring, HTTPS enforcement, IDS/IPS, SIEM correlation, firewall rules</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-pending">○</span><div class="deliv-text"><strong>Defender Mindset Reflection</strong>Three themes: Normal Behavior, Defensive Depth, Communication Control</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-pending">○</span><div class="deliv-text"><strong>Learning Resource Notes</strong>Notes from all 5 required platforms included in the report</div></div>
+        </div>
+
+        <div class="section-head">// Technical Breakdown — Packet Journey</div>
+        <ul class="breakdown-list">
+          <li class="breakdown-item"><span class="bd-num">01</span><div><div class="bd-title">User Enters a URL</div><div class="bd-desc">The browser cannot communicate directly with a domain name — it must first resolve it to an IP address. The packet journey begins the moment the user presses Enter.</div></div></li>
+          <li class="breakdown-item"><span class="bd-num">02</span><div><div class="bd-title">DNS Resolution</div><div class="bd-desc">Browser checks its cache, then OS cache, then queries the recursive resolver → root DNS server → TLD server → authoritative DNS server to obtain the destination IP address.</div><span class="bd-risk">⚠ Risk: DNS spoofing · Hijacking · Malicious redirects · C2 callbacks</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">03</span><div><div class="bd-title">TCP Three-Way Handshake</div><div class="bd-desc">Browser and server establish a reliable connection using SYN → SYN-ACK → ACK before any data transfer begins, ensuring both sides are ready to communicate.</div><span class="bd-risk">⚠ Risk: SYN floods · Port scanning · Abnormal connection patterns</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">04</span><div><div class="bd-title">TLS / HTTPS Negotiation</div><div class="bd-desc">When HTTPS is used, TLS establishes encrypted communication through certificate verification, key exchange, and session encryption — protecting confidentiality and integrity.</div><span class="bd-risk">⚠ Risk: TLS downgrade · Certificate spoofing · Man-in-the-middle attacks</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">05</span><div><div class="bd-title">HTTP Request & Response</div><div class="bd-desc">Browser sends an HTTP request with headers, cookies, and method. Server responds with status codes and returns HTML, CSS, JavaScript, images, and other resources.</div><span class="bd-risk">⚠ Risk: Suspicious user agents · Cookie theft · Abnormal response patterns</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">06</span><div><div class="bd-title">Routing & Packet Movement</div><div class="bd-desc">Packets travel through multiple routers, switches, and gateways across networks before reaching the destination. Each hop makes routing decisions based on IP and MAC addresses.</div><span class="bd-risk">⚠ Risk: Poor segmentation · ARP spoofing · Lateral movement · Flat networks</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">07</span><div><div class="bd-title">Browser Renders the Webpage</div><div class="bd-desc">After receiving the server response, the browser processes HTML, CSS, and JavaScript. Modern sites trigger dozens of additional requests — each creating more network activity and monitoring opportunities for defenders.</div></div></li>
+        </ul>
+
+        <div class="section-head">// Learning Resources</div>
+        <div class="resources-grid">
+          <a href="https://www.netacad.com/courses/getting-started-cisco-packet-tracer" target="_blank" class="resource-card"><span class="rc-icon">🌐</span><div><div class="rc-name">Cisco Packet Tracer</div><div class="rc-sub">Cisco Networking Academy</div><span class="rc-status rcs-pending">To Complete</span></div></a>
+          <a href="https://studio.code.org/courses/csp-2024/units/2/lessons/5" target="_blank" class="resource-card"><span class="rc-icon">📦</span><div><div class="rc-name">Internet Simulator — Packets</div><div class="rc-sub">Code.org</div><span class="rc-status rcs-pending">To Complete</span></div></a>
+          <a href="https://app.letsdefend.io/training/lessons/network-packet-analysis" target="_blank" class="resource-card"><span class="rc-icon">🛡️</span><div><div class="rc-name">Network Packet Analysis</div><div class="rc-sub">Let'sDefend</div><span class="rc-status rcs-pending">To Complete</span></div></a>
+          <a href="https://academy.hackthebox.com/course/preview/introduction-to-networking" target="_blank" class="resource-card"><span class="rc-icon">📡</span><div><div class="rc-name">Introduction to Networking</div><div class="rc-sub">Hack The Box Academy</div><span class="rc-status rcs-pending">To Complete</span></div></a>
+          <a href="https://tryhackme.com/room/networkingconcepts" target="_blank" class="resource-card"><span class="rc-icon">💻</span><div><div class="rc-name">Networking Concepts</div><div class="rc-sub">TryHackMe</div><span class="rc-status rcs-pending">To Complete</span></div></a>
+        </div>
+
+        <div class="section-head">// Defender Mindset — 3 Required Themes</div>
+        <div class="mindset-grid">
+          <div class="mindset-card"><div class="mindset-num">// Theme 01</div><div class="mindset-title">Verification of Normal Behavior</div><div class="mindset-desc">Defenders must understand what normal traffic looks like before they can identify abnormal traffic. Baselines for DNS queries, TCP handshakes, HTTPS behavior, and common port usage help detect anomalies — repeated failed connections, unusual DNS requests, unexpected outbound traffic, or communication with unknown external servers.</div></div>
+          <div class="mindset-card"><div class="mindset-num">// Theme 02</div><div class="mindset-title">The Strategy of Defensive Depth</div><div class="mindset-desc">Security should never depend on a single control. Layered defenses — DNS filtering, firewalls, IDS/IPS, endpoint detection, network segmentation, HTTPS enforcement, SIEM monitoring, access control, and logging — work together so that if one layer fails, another detects, blocks, or slows the attacker.</div></div>
+          <div class="mindset-card"><div class="mindset-num">// Theme 03</div><div class="mindset-title">Controlling the Path of Communication</div><div class="mindset-desc">Controlling communication paths limits attacker movement and improves defensive visibility. Poorly segmented networks give attackers shortcuts to sensitive systems. Proper segmentation, routing rules, firewall policies, and isolation of critical systems force traffic through monitored paths — enabling defenders to detect, slow, or isolate threats.</div></div>
+        </div>
+
+        <div class="section-head">// Skills & Tools This Week</div>
+        <div class="skills-row">
+          <span class="tag">DNS Resolution</span><span class="tag">TCP/IP</span><span class="tag">TLS/HTTPS</span><span class="tag">HTTP Protocol</span><span class="tag">Packet Analysis</span><span class="tag">Network Routing</span>
+          <span class="tag green">Cisco Packet Tracer</span><span class="tag green">Wireshark</span><span class="tag green">TryHackMe</span><span class="tag green">HackTheBox Academy</span><span class="tag green">Let'sDefend</span>
+          <span class="tag orange">Defender Mindset</span><span class="tag orange">Threat Detection</span><span class="tag orange">MITM Awareness</span>
+        </div>
+
       </div>
     </div>
   </div>
-  <!-- ═══ END WEEK 1 ═══ -->
 
-  <!-- ═══ UPCOMING WEEKS — Will be updated as you progress ═══ -->
+  <!-- UPCOMING -->
   <div class="upcoming-card">
-    <p>📅 Week 2 and beyond will be added as the internship progresses</p>
+    <p>📅 Week 2 and beyond will be added as the internship progresses — check back for updates</p>
   </div>
-
 </div>
 
 <footer>
   <div class="footer-inner">
     <span>© 2026 · Rizuanul Haque · Cybersecurity Portfolio</span>
-    <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="projects.html">Projects</a>
-      <a href="experience.html">Experience</a>
-      <a href="contact.html">Contact</a>
-    </div>
+    <div class="footer-links"><a href="index.html">Home</a><a href="projects.html">Projects</a><a href="experience.html">Experience</a><a href="contact.html">Contact</a></div>
   </div>
 </footer>
 <button class="scroll-top" id="scrollTop">↑</button>
 
 <script>
-  // Theme
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'light') document.body.classList.add('light');
   const btn = document.getElementById('themeBtn');
   btn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
   btn.addEventListener('click', () => { document.body.classList.toggle('light'); const l = document.body.classList.contains('light'); btn.textContent = l?'☀️':'🌙'; localStorage.setItem('theme',l?'light':'dark'); });
-
-  // Scroll top
   const st = document.getElementById('scrollTop');
   window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
   st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-  // Toggle week accordion
-  function toggleWeek(id) {
-    const card = document.getElementById(id);
-    card.classList.toggle('active');
-  }
-
-  // Auto-count stats
-  const doneTasks = document.querySelectorAll('.tc-done').length;
-  const allTools = new Set();
-  document.querySelectorAll('.skills-tags .tag').forEach(t => allTools.add(t.textContent.trim()));
-  const activeWeeks = document.querySelectorAll('.ws-complete, .ws-active').length;
-  document.getElementById('weeksCount').textContent = activeWeeks;
-  document.getElementById('tasksCount').textContent = doneTasks;
-  document.getElementById('toolsCount').textContent = allTools.size;
+  function toggleWeek(id) { document.getElementById(id).classList.toggle('open'); }
 </script>
 </body>
 </html>
