@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wazuh Administration Lab — Rizuanul Haque</title>
+<meta name="description" content="Wazuh SIEM/XDR installation, agent deployment, syslog integration, and web attack detection lab by Rizuanul Haque.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #21262d; --surface3: #2d333b;
+    --border: #30363d; --accent: #00d4ff; --accent2: #3fb950; --accent3: #ff6b35;
+    --accent4: #c084fc; --text: #e6edf3; --muted: #8b949e; --code-bg: #1c2128;
+    --font-head: 'Syne', sans-serif; --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace; --transition: 0.25s ease; --radius: 10px;
+  }
+
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+
+  /* NAV */
+  nav { position: sticky; top: 0; z-index: 200; background: rgba(13,17,23,0.92); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 56px; display: flex; align-items: center; gap: 1rem; backdrop-filter: blur(12px); }
+  .nav-logo { font-family: var(--font-head); font-size: 1rem; font-weight: 800; background: linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+  .nav-sep { color: var(--border); }
+  .nav-title { font-family: var(--font-mono); font-size: 0.73rem; color: var(--muted); }
+  .nav-back { margin-left: auto; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-decoration: none; padding: 4px 12px; border: 1px solid var(--border); border-radius: 20px; transition: all 0.2s; }
+  .nav-back:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* HERO */
+  .hero { padding: 4rem 2rem 3rem; max-width: 900px; margin: 0 auto; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; }
+  .badge-blue { background: rgba(0,212,255,0.08); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
+  .badge-green { background: rgba(63,185,80,0.08); color: var(--accent2); border: 1px solid rgba(63,185,80,0.25); }
+  .badge-orange { background: rgba(255,107,53,0.08); color: var(--accent3); border: 1px solid rgba(255,107,53,0.25); }
+  .badge-purple { background: rgba(192,132,252,0.08); color: var(--accent4); border: 1px solid rgba(192,132,252,0.25); }
+
+  .lab-series { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+  .lab-series::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--accent2); }
+
+  h1 { font-family: var(--font-head); font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  h1 span { background: linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; color: var(--muted); font-size: 0.82rem; margin-bottom: 1.5rem; font-family: var(--font-mono); }
+  .hero-desc { font-size: 1rem; color: #b1bac4; max-width: 700px; border-left: 3px solid var(--accent); padding-left: 1.2rem; font-weight: 300; line-height: 1.8; }
+
+  /* LAYOUT */
+  .layout { max-width: 900px; margin: 0 auto; padding: 0 2rem 5rem; display: grid; grid-template-columns: 180px 1fr; gap: 3rem; align-items: start; }
+
+  /* TOC */
+  .toc { position: sticky; top: 72px; font-size: 0.8rem; }
+  .toc-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+  .toc ol { list-style: none; }
+  .toc li { margin-bottom: 0.2rem; }
+  .toc a { color: var(--muted); text-decoration: none; display: block; padding: 4px 8px; border-left: 2px solid transparent; border-radius: 0 4px 4px 0; transition: all 0.2s; font-size: 0.75rem; line-height: 1.4; }
+  .toc a:hover { color: var(--accent); border-left-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .toc-divider { height: 1px; background: var(--border); margin: 0.6rem 0; }
+
+  /* SECTIONS */
+  .content section { margin-bottom: 3rem; scroll-margin-top: 80px; }
+  .section-banner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-start; position: relative; overflow: hidden; }
+  .section-banner::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, var(--accent), var(--accent2)); }
+  .section-banner-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .section-banner-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .section-banner-title { font-family: var(--font-head); font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 0.3rem; }
+  .section-banner-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  .step-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; }
+  h2 { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.9rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text); }
+  h3 { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; color: var(--text); margin: 1.5rem 0 0.75rem; }
+  p { color: #b1bac4; font-size: 0.92rem; margin-bottom: 0.75rem; line-height: 1.7; }
+
+  /* STEP CARDS */
+  .step-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; transition: all var(--transition); position: relative; overflow: hidden; }
+  .step-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom,var(--accent),var(--accent2)); opacity: 0; transition: opacity var(--transition); }
+  .step-card:hover { border-color: rgba(0,212,255,0.3); transform: translateX(3px); }
+  .step-card:hover::before { opacity: 1; }
+  .step-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+  .step-badge { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); border-radius: 6px; padding: 2px 8px; flex-shrink: 0; }
+  .step-title { font-family: var(--font-head); font-size: 0.9rem; font-weight: 700; color: var(--text); }
+  .step-desc { font-size: 0.86rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.75rem; }
+
+  /* CODE BLOCKS */
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; margin: 0.75rem 0; overflow: hidden; }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 7px 1rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .code-lang { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.05em; }
+  .code-dots { display: flex; gap: 5px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f78166; } .dot-y { background: #d29922; } .dot-g { background: #3fb950; }
+  pre { padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.65; color: #79c0ff; }
+  .cmd { color: #79c0ff; } .flag { color: #ffa657; } .path { color: #a5d6ff; }
+  .cm { color: #6e7681; font-style: italic; } .val { color: #56d364; }
+
+  /* CALLOUT */
+  .callout { border: 1px solid rgba(0,212,255,0.2); background: rgba(0,212,255,0.05); border-radius: 8px; padding: 1rem 1.2rem; margin: 0.75rem 0; font-size: 0.88rem; color: #a5c8f8; line-height: 1.7; }
+  .callout strong { color: var(--accent); display: block; margin-bottom: 0.3rem; font-size: 0.72rem; font-family: var(--font-mono); letter-spacing: 0.08em; }
+  .callout.green { border-color: rgba(63,185,80,0.2); background: rgba(63,185,80,0.05); color: #7ee787; }
+  .callout.green strong { color: var(--accent2); }
+  .callout.orange { border-color: rgba(255,107,53,0.2); background: rgba(255,107,53,0.05); color: #ffa657; }
+  .callout.orange strong { color: var(--accent3); }
+  .callout.purple { border-color: rgba(192,132,252,0.2); background: rgba(192,132,252,0.05); color: #d2a8ff; }
+  .callout.purple strong { color: var(--accent4); }
+
+  /* SUMMARY CARD */
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-top: 1rem; }
+  .summary-card h3 { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); margin-bottom: 1rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .cmd-list { list-style: none; }
+  .cmd-list li { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+  .cmd-list li:last-child { border-bottom: none; }
+  .cmd-name { font-family: var(--font-mono); color: var(--accent); font-size: 0.75rem; min-width: 200px; flex-shrink: 0; word-break: break-all; }
+  .cmd-desc { color: var(--muted); }
+
+  /* COMPONENT TABLE */
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 1rem 0; border-radius: 8px; overflow: hidden; }
+  .comp-table th { background: var(--surface2); color: var(--muted); padding: 8px 12px; text-align: left; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .comp-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: #b1bac4; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: var(--surface2); }
+  .comp-table td:first-child { font-family: var(--font-mono); color: var(--accent); font-size: 0.8rem; }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  .scroll-top { position: fixed; bottom: 2rem; right: 2rem; width: 38px; height: 38px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: all 0.2s; }
+  .scroll-top.visible { opacity: 1; }
+  .scroll-top:hover { border-color: var(--accent); color: var(--accent); }
+
+  @media (max-width:640px) { .layout { grid-template-columns: 1fr; } .toc { display: none; } .hero { padding: 2.5rem 1.25rem 2rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-title">wazuh-administration-lab</span>
+  <a href="projects.html" class="nav-back">← Projects</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge-row">
+    <span class="badge badge-blue">Wazuh</span>
+    <span class="badge badge-blue">SIEM / XDR</span>
+    <span class="badge badge-blue">Syslog</span>
+    <span class="badge badge-orange">Web Attack Detection</span>
+    <span class="badge badge-purple">SQL Injection</span>
+    <span class="badge badge-purple">XSS</span>
+    <span class="badge badge-green">✓ Completed</span>
+  </div>
+  <div class="lab-series">Certified SOC Analyst (CSA) · Lab</div>
+  <h1>Wazuh <span>Administration</span> Lab</h1>
+  <div class="hero-meta">
+    <span>🛡️ SIEM / XDR Platform</span>
+    <span>🐧 Kali Linux</span>
+    <span>🔍 Web Attack Detection</span>
+    <span>📡 Syslog Integration</span>
+    <span>👨‍🏫 Instructor: Bappe Sarker</span>
+  </div>
+  <p class="hero-desc">
+    Install and configure Wazuh — a unified XDR and SIEM platform — on Kali Linux. Deploy Windows and Linux agents, integrate syslog from multiple devices including MikroTik routers and Cisco switches, forward Apache2 logs, and detect real-world web attacks including SQL injection and Cross-Site Scripting.
+  </p>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#install">Part 1 — Installation</a></li>
+      <li><a href="#dashboard">Part 2 — Dashboard</a></li>
+      <li><a href="#agent-windows">Part 3 — Windows Agent</a></li>
+      <li><a href="#syslog">Part 4 — Syslog Integration</a></li>
+      <li><a href="#apache">Part 5 — Apache2 Logs</a></li>
+      <li><a href="#mikrotik">Part 6 — MikroTik Router</a></li>
+      <li><a href="#switch">Part 7 — Cisco Switch</a></li>
+      <li><a href="#attacks">Part 8 — Attack Detection</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ol>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- OVERVIEW -->
+    <section id="overview">
+      <span class="step-num">// Overview</span>
+      <h2>What is Wazuh?</h2>
+      <p>Wazuh is an open-source security platform that provides unified XDR (Extended Detection and Response) and SIEM (Security Information and Event Management) protection for endpoints and cloud workloads. In this lab, Wazuh is installed in single-server mode on a Kali Linux VM.</p>
+
+      <table class="comp-table">
+        <thead><tr><th>Component</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Wazuh Server</td><td>Central component — processes alerts and manages agents</td></tr>
+          <tr><td>Wazuh Indexer</td><td>Stores and indexes security events and alerts</td></tr>
+          <tr><td>Wazuh Dashboard</td><td>Web UI for visualizing security data and events</td></tr>
+          <tr><td>Universal Agent</td><td>Installed on endpoints — collects and sends security data</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <strong>// LAB REFERENCE</strong>
+        <a href="https://computingforgeeks.com/how-to-install-wazuh-server-on-ubuntu/" target="_blank" style="color:var(--accent)">https://computingforgeeks.com/how-to-install-wazuh-server-on-ubuntu/</a><br>
+        <a href="https://documentation.wazuh.com/current/release-notes/index.html" target="_blank" style="color:var(--accent)">Wazuh Release Notes & Documentation</a>
+      </div>
+    </section>
+
+    <!-- PART 1 — INSTALLATION -->
+    <section id="install">
+      <div class="section-banner">
+        <span class="section-banner-icon">⚙️</span>
+        <div>
+          <div class="section-banner-label">// Part 1 of 8</div>
+          <div class="section-banner-title">Wazuh Server Installation</div>
+          <div class="section-banner-desc">Install all dependencies and deploy the Wazuh all-in-one installer on Kali Linux. Includes a pre-requisite step for non-Ubuntu OS environments.</div>
+        </div>
+      </div>
+
+      <div class="callout orange">
+        <strong>// PRE-REQUISITE — Non-Ubuntu OS (Kali Linux)</strong>
+        Before running the installer on Kali, add the Debian stable repository to your sources list:
+        <br><br><code style="font-family:var(--font-mono);color:var(--accent3)">nano /etc/apt/sources.list</code><br>
+        Add this line: <code style="font-family:var(--font-mono);color:#ffa657">deb http://deb.debian.org/debian stable main contrib non-free</code>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Update Your Repository</span></div>
+        <div class="step-desc">Update the Kali/Ubuntu package repository to ensure all packages are current before installing dependencies.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">bash</span></div>
+          <pre><span class="cmd">sudo apt update</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02</span><span class="step-title">Install All Dependencies</span></div>
+        <div class="step-desc">Install the required packages that Wazuh needs to run successfully.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">bash</span></div>
+          <pre><span class="cmd">sudo apt install vim curl apt-transport-https unzip wget \
+  libcap2-bin software-properties-common lsb-release gnupg2</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 03</span><span class="step-title">Download the All-in-One Installer</span></div>
+        <div class="step-desc">Download the Wazuh installation script. You can modify the version number based on the latest release notes.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">bash</span></div>
+          <pre><span class="cmd">curl -sO https://packages.wazuh.com/4.12/wazuh-install.sh</span></pre>
+        </div>
+        <div class="callout">
+          <strong>// NOTE</strong>
+          If you encounter hardware requirement errors, skip the hardware check using the <code style="font-family:var(--font-mono)">--ignore-check</code> parameter.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 04</span><span class="step-title">Run the Installer</span></div>
+        <div class="step-desc">Execute the all-in-one installation script. This installs the Wazuh server, indexer, and dashboard in a single command. The console output will display your admin credentials — save these immediately.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">bash</span></div>
+          <pre><span class="cmd">sudo bash ./wazuh-install.sh -a</span>
+<span class="cm"># Use --ignore-check if hardware requirements fail:</span>
+<span class="cmd">sudo bash ./wazuh-install.sh -a --ignore-check</span></pre>
+        </div>
+        <div class="callout green">
+          <strong>// IMPORTANT — Save Your Credentials</strong>
+          When installation completes, the console outputs your Wazuh admin username and password. These are your dashboard login credentials — copy and store them securely before closing the terminal.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 2 — DASHBOARD -->
+    <section id="dashboard">
+      <div class="section-banner">
+        <span class="section-banner-icon">📊</span>
+        <div>
+          <div class="section-banner-label">// Part 2 of 8</div>
+          <div class="section-banner-title">Dashboard Access</div>
+          <div class="section-banner-desc">Access the Wazuh web dashboard using the admin credentials generated during installation.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Open the Dashboard in Your Browser</span></div>
+        <div class="step-desc">Open a browser and navigate to the Wazuh server IP address using HTTPS.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">url</span></div>
+          <pre><span class="val">https://&lt;your_server_ip&gt;/</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02</span><span class="step-title">Log In with Admin Credentials</span></div>
+        <div class="step-desc">Enter the admin username and password that were displayed in the console output at the end of the installation.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 03</span><span class="step-title">Access the Dashboard</span></div>
+        <div class="step-desc">Once logged in, you have access to the full Wazuh security dashboard — showing agents, alerts, security events, and compliance modules.</div>
+      </div>
+    </section>
+
+    <!-- PART 3 — WINDOWS AGENT -->
+    <section id="agent-windows">
+      <div class="section-banner">
+        <span class="section-banner-icon">🪟</span>
+        <div>
+          <div class="section-banner-label">// Part 3 of 8</div>
+          <div class="section-banner-title">Windows Agent Installation</div>
+          <div class="section-banner-desc">Deploy the Wazuh agent on a Windows endpoint so it can send security telemetry back to the Wazuh server.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Navigate to Agent Deployment</span></div>
+        <div class="step-desc">In the Wazuh dashboard, go to <strong>Wazuh → Agents → Deploy New Agent</strong>.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02</span><span class="step-title">Select Windows & Set Server IP</span></div>
+        <div class="step-desc">Select the target OS. For Windows, click <strong>MSI 32/64 bits</strong> and enter your Wazuh server's IP address in the server address field.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 03</span><span class="step-title">Copy the Deployment Command</span></div>
+        <div class="step-desc">Scroll down and copy the auto-generated PowerShell deployment command shown on the page.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 04</span><span class="step-title">Extract the MSI Download Link</span></div>
+        <div class="step-desc">From the deployment command, extract the MSI file download URL to manually download the installer.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 05</span><span class="step-title">Download & Install the MSI</span></div>
+        <div class="step-desc">Download the MSI file and install it by double-clicking. Follow the installation wizard prompts.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 06</span><span class="step-title">Configure the Agent — Set Server IP</span></div>
+        <div class="step-desc">After installation, navigate to the ossec-agent directory and edit the configuration file to point to your Wazuh server.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">path</span></div>
+          <pre><span class="path">C:\Program Files (x86)\ossec-agent\ossec.conf</span>
+<span class="cm"># Open in Notepad and set your Wazuh server IP in the &lt;server&gt; section</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 07</span><span class="step-title">Run Services as Administrator</span></div>
+        <div class="step-desc">Open the Services panel as Administrator to manage the Wazuh agent service.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 08</span><span class="step-title">Start the Wazuh Agent Service</span></div>
+        <div class="step-desc">Start the Wazuh service. The agent will connect to the server and begin forwarding Windows security events.</div>
+        <div class="callout green">
+          <strong>// RESULT</strong>
+          The Windows endpoint now appears in the Wazuh dashboard under Agents — sending real-time security telemetry including Windows Event Logs, file integrity monitoring, and vulnerability data.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 4 — SYSLOG -->
+    <section id="syslog">
+      <div class="section-banner">
+        <span class="section-banner-icon">📡</span>
+        <div>
+          <div class="section-banner-label">// Part 4 of 8</div>
+          <div class="section-banner-title">Syslog Integration</div>
+          <div class="section-banner-desc">Configure Wazuh as a syslog server and integrate a Linux endpoint (OWASP) to forward its system logs.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Configure Wazuh as a Syslog Server</span></div>
+        <div class="step-desc">In the Wazuh dashboard, navigate to <strong>Wazuh Menu → Management → Configuration</strong> to enable syslog reception.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02</span><span class="step-title">SSH into the Linux Server (OWASP)</span></div>
+        <div class="step-desc">From your Windows machine, SSH into the target Linux server that will forward its logs.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">bash</span></div>
+          <pre><span class="cmd">ssh user@&lt;owasp_server_ip&gt;</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 03</span><span class="step-title">Edit the Syslog Configuration File</span></div>
+        <div class="step-desc">On the target Linux system, edit the syslog configuration file to forward logs to Wazuh.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">bash</span></div>
+          <pre><span class="cmd">nano /etc/rsyslog.conf</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 04</span><span class="step-title">Add Forwarding Rule & Restart</span></div>
+        <div class="step-desc">Add the following line at the end of the file — replace the IP with your Wazuh server IP. Save with <code style="font-family:var(--font-mono)">Ctrl+X</code>, then <code style="font-family:var(--font-mono)">Y</code>, then restart the server.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">rsyslog config</span></div>
+          <pre><span class="val">*.* @&lt;wazuh_server_ip&gt;:514</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 05</span><span class="step-title">Verify Logs in Wazuh Dashboard</span></div>
+        <div class="step-desc">In the Wazuh dashboard, use the Discover option — search for the Linux server's IP to confirm syslog messages are arriving from the OWASP server.</div>
+        <div class="callout green">
+          <strong>// RESULT</strong>
+          Linux syslog messages from the OWASP server now appear in the Wazuh Discover view, giving defenders visibility into system events from a non-agent device.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 5 — APACHE2 -->
+    <section id="apache">
+      <div class="section-banner">
+        <span class="section-banner-icon">🌐</span>
+        <div>
+          <div class="section-banner-label">// Part 5 of 8</div>
+          <div class="section-banner-title">Apache2 Log Forwarding via Syslog</div>
+          <div class="section-banner-desc">Configure rsyslog to forward Apache2 web server access logs to Wazuh for web traffic monitoring and attack detection.</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>// REFERENCE</strong>
+        <a href="https://kifarunix.com/forward-apache-logs-to-central-log-server-with-rsyslog/" target="_blank" style="color:var(--accent)">https://kifarunix.com/forward-apache-logs-to-central-log-server-with-rsyslog/</a>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Create rsyslog Configuration File</span></div>
+        <div class="step-desc">Create a dedicated rsyslog configuration file for Apache2 log forwarding.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">bash</span></div>
+          <pre><span class="cmd">nano /etc/rsyslog.d/02-apache2.conf</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02 — 03</span><span class="step-title">Add the Forwarding Configuration</span></div>
+        <div class="step-desc">Add the following configuration to the file. This uses the imfile module to monitor Apache's access log and forward it via syslog to the Wazuh server on port 514.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">rsyslog config</span></div>
+          <pre><span class="cm"># Load the file input module</span>
+<span class="val">module(load="imfile" PollingInterval="10"
+       statefile.directory="/var/spool/rsyslog")</span>
+
+<span class="cm"># Monitor Apache2 access log</span>
+<span class="val">input(type="imfile"
+      File="/var/log/apache2/access.log"
+      Tag="http_access"
+      Facility="local7")</span>
+
+<span class="cm"># Forward to Wazuh server (replace IP with your Wazuh server IP)</span>
+<span class="val">local7.*    @192.168.5.190:514</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 04</span><span class="step-title">Save Configuration</span></div>
+        <div class="step-desc">Save the file using <code style="font-family:var(--font-mono)">Ctrl+X</code>, then press <code style="font-family:var(--font-mono)">Y</code> and <code style="font-family:var(--font-mono)">Enter</code> to confirm.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 05</span><span class="step-title">Restart Services</span></div>
+        <div class="step-desc">Restart both rsyslog and Apache2 to apply the new configuration.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">bash</span></div>
+          <pre><span class="cmd">service rsyslog restart</span>
+<span class="cmd">service apache2 start</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 06</span><span class="step-title">Verify Logs in Wazuh</span></div>
+        <div class="step-desc">Browse to your Apache server to generate traffic, then check the Wazuh Discover option — Apache access logs tagged <code style="font-family:var(--font-mono)">http_access</code> will appear in the dashboard.</div>
+        <div class="callout green">
+          <strong>// RESULT</strong>
+          Apache2 web server access logs are now flowing into Wazuh in real time — enabling web traffic analysis, suspicious request detection, and HTTP-based attack monitoring.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 6 — MIKROTIK -->
+    <section id="mikrotik">
+      <div class="section-banner">
+        <span class="section-banner-icon">🔀</span>
+        <div>
+          <div class="section-banner-label">// Part 6 of 8</div>
+          <div class="section-banner-title">MikroTik Router — Syslog Integration</div>
+          <div class="section-banner-desc">Install MikroTik RouterOS as a VM and configure it to forward all router logs to the Wazuh syslog server.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Create VM with Custom Settings</span></div>
+        <div class="step-desc">Create a new virtual machine using custom settings and map the MikroTik ISO file to the virtual DVD drive.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02</span><span class="step-title">Select OS Type</span></div>
+        <div class="step-desc">Set the OS type to <strong>Linux</strong> and version to <strong>Other Linux 4.x Kernel</strong> in the VM settings.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 03</span><span class="step-title">Install MikroTik RouterOS</span></div>
+        <div class="step-desc">Boot the VM from the ISO. Press <code style="font-family:var(--font-mono)">i</code> to install and then <code style="font-family:var(--font-mono)">Y</code> to confirm the installation.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">mikrotik console</span></div>
+          <pre><span class="cm"># Press 'i' to install</span>
+<span class="val">i</span>
+<span class="cm"># Press 'Y' to confirm</span>
+<span class="val">Y</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 04</span><span class="step-title">Connect via Winbox</span></div>
+        <div class="step-desc">Open the Winbox application on Windows and click <strong>Neighbors</strong> to discover the MikroTik router — it appears with IP <code style="font-family:var(--font-mono)">0.0.0.0</code> initially. Click to connect.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 05</span><span class="step-title">Change Default Password</span></div>
+        <div class="step-desc">After connecting, immediately change the default admin password to a secure one.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 06</span><span class="step-title">Configure IP Address via DHCP</span></div>
+        <div class="step-desc">Navigate to <strong>IP → DHCP Client → Add an Interface</strong>. The IP address will be automatically assigned via DHCP.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 07</span><span class="step-title">Configure Syslog Forwarding to Wazuh</span></div>
+        <div class="step-desc">Configure MikroTik to send all log rules to the Wazuh syslog server.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">winbox navigation</span></div>
+          <pre><span class="val">System → Logging</span>
+<span class="cm"># Set ALL rules as: remote</span>
+
+<span class="val">Go to: Actions → Right-click "remote"</span>
+<span class="cm"># Set Remote Address = &lt;wazuh_server_ip&gt;</span>
+<span class="cm"># Click OK</span></pre>
+        </div>
+        <div class="callout green">
+          <strong>// RESULT</strong>
+          All MikroTik router logs — including routing decisions, firewall events, and connection logs — are now forwarded to Wazuh, giving defenders full visibility into network layer activity.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 7 — CISCO SWITCH -->
+    <section id="switch">
+      <div class="section-banner">
+        <span class="section-banner-icon">🔌</span>
+        <div>
+          <div class="section-banner-label">// Part 7 of 8</div>
+          <div class="section-banner-title">Cisco Switch — Syslog Configuration</div>
+          <div class="section-banner-desc">Configure a Cisco switch to send syslog alerts to Wazuh via both the web console and command line.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01 — Web Console</span><span class="step-title">Configure via Web Interface</span></div>
+        <div class="step-desc">Access the Cisco switch web console and configure syslog forwarding.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">navigation</span></div>
+          <pre><span class="val">Web Console → Troubleshooting → Syslog
+→ Manage Syslog Server
+→ Set Syslog Alert Level
+→ Add IP of Wazuh Server</span></pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02 — CLI</span><span class="step-title">Configure via Command Line</span></div>
+        <div class="step-desc">Alternatively, configure syslog forwarding using Cisco IOS commands via CLI.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">cisco ios</span></div>
+          <pre><span class="cmd">configure terminal</span>
+<span class="cmd">logging host &lt;wazuh_server_ip&gt;</span>
+<span class="cmd">logging trap informational</span>
+<span class="cmd">end</span>
+<span class="cmd">write memory</span></pre>
+        </div>
+        <div class="callout green">
+          <strong>// RESULT</strong>
+          Cisco switch syslog events — including interface up/down, authentication attempts, and configuration changes — are forwarded to Wazuh, completing centralized network device monitoring.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 8 — ATTACK DETECTION -->
+    <section id="attacks">
+      <div class="section-banner">
+        <span class="section-banner-icon">⚔️</span>
+        <div>
+          <div class="section-banner-label">// Part 8 of 8</div>
+          <div class="section-banner-title">Web Attack Detection</div>
+          <div class="section-banner-desc">Simulate SQL Injection and Cross-Site Scripting (XSS) attacks against the Apache2 web server and observe how Wazuh detects and logs them.</div>
+        </div>
+      </div>
+
+      <h3>SQL Injection Detection</h3>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Simulate a SQL Injection Attack</span></div>
+        <div class="step-desc">Craft a URL that contains a classic SQL injection payload and send it to the Apache2 web server.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">attack url</span></div>
+          <pre><span class="val">https://192.168.1.190/abc?id=admin' or '1'='1</span></pre>
+        </div>
+        <div class="callout orange">
+          <strong>// ATTACK EXPLAINED</strong>
+          The payload <code style="font-family:var(--font-mono)">' or '1'='1</code> is a classic SQL injection that attempts to bypass authentication by making a WHERE clause always evaluate to true — potentially returning all records from a database.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02</span><span class="step-title">Verify Detection in Wazuh</span></div>
+        <div class="step-desc">In the Wazuh dashboard, go to <strong>Discover</strong>, search for the server's IP address, and expand the log details to see the SQL injection attempt captured and classified.</div>
+        <div class="callout green">
+          <strong>// DETECTION CONFIRMED</strong>
+          Wazuh detects the SQL injection pattern in the HTTP request URL and generates an alert — visible in the Discover view with full request details including source IP, timestamp, and payload.
+        </div>
+      </div>
+
+      <h3>Cross-Site Scripting (XSS) Detection</h3>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Simulate an XSS Attack</span></div>
+        <div class="step-desc">Craft a URL containing an XSS payload — a script tag injected into a query parameter — and send it to the Apache2 server.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">attack url</span></div>
+          <pre><span class="val">https://192.168.1.190/abc?id=&lt;script&gt;alert(1)&lt;/script&gt;</span></pre>
+        </div>
+        <div class="callout purple">
+          <strong>// ATTACK EXPLAINED</strong>
+          This XSS payload attempts to inject a JavaScript <code style="font-family:var(--font-mono)">&lt;script&gt;</code> tag into the server response. If reflected back to a user's browser without sanitization, it would execute arbitrary JavaScript — potentially stealing session cookies or redirecting users.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02</span><span class="step-title">Verify Detection in Wazuh</span></div>
+        <div class="step-desc">Return to the Wazuh Discover view, search for the server IP, and expand the log to see the XSS attempt captured with full request details.</div>
+        <div class="callout green">
+          <strong>// DETECTION CONFIRMED</strong>
+          Wazuh identifies the script injection pattern in the HTTP request and alerts — demonstrating how SIEM platforms can detect web-based attacks from centralized log analysis without requiring agents on every web server.
+        </div>
+      </div>
+    </section>
+
+    <!-- SUMMARY -->
+    <section id="summary">
+      <span class="step-num">// Summary</span>
+      <h2>Lab Summary</h2>
+      <p>This lab covered the complete deployment and configuration of Wazuh as a centralized SIEM/XDR platform — from installation on Kali Linux, through multi-source log aggregation, to real-world web attack detection. The environment now monitors Windows endpoints, Linux servers, a MikroTik router, a Cisco switch, and an Apache2 web server — all feeding into a single Wazuh dashboard.</p>
+
+      <div class="summary-card">
+        <h3>// Key Commands & Configurations</h3>
+        <ul class="cmd-list">
+          <li><span class="cmd-name">sudo apt update</span><span class="cmd-desc">Update package repository</span></li>
+          <li><span class="cmd-name">curl -sO wazuh-install.sh</span><span class="cmd-desc">Download the Wazuh all-in-one installer</span></li>
+          <li><span class="cmd-name">sudo bash wazuh-install.sh -a</span><span class="cmd-desc">Run all-in-one installation</span></li>
+          <li><span class="cmd-name">nano /etc/rsyslog.d/02-apache2.conf</span><span class="cmd-desc">Create Apache2 syslog forwarding config</span></li>
+          <li><span class="cmd-name">service rsyslog restart</span><span class="cmd-desc">Apply rsyslog configuration changes</span></li>
+          <li><span class="cmd-name">*.* @&lt;wazuh_ip&gt;:514</span><span class="cmd-desc">Syslog forwarding rule (rsyslog)</span></li>
+          <li><span class="cmd-name">logging host &lt;wazuh_ip&gt;</span><span class="cmd-desc">Cisco IOS syslog forwarding command</span></li>
+        </ul>
+      </div>
+
+      <div class="callout" style="margin-top:1.25rem;">
+        <strong>// SKILLS DEMONSTRATED</strong>
+        SIEM deployment · XDR agent installation · Syslog integration · Multi-device log aggregation · Web attack detection · SQL Injection awareness · XSS awareness · Wazuh dashboard analysis · Network device monitoring
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Certified SOC Analyst Lab · Cybersecurity Portfolio</p>
+</footer>
+<button class="scroll-top" id="scrollTop">↑</button>
+
+<script>
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // Active TOC highlight
+  const links = document.querySelectorAll('.toc a');
+  const sections = document.querySelectorAll('.content section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.style.color = '');
+        const a = document.querySelector('.toc a[href="#' + e.target.id + '"]');
+        if (a) { a.style.color = 'var(--accent)'; a.style.borderLeftColor = 'var(--accent)'; }
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
