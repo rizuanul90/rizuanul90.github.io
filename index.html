@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rizuanul Haque — Cybersecurity Portfolio</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2215%22 fill=%22%230d1117%22/><text y=%22.9em%22 font-size=%2260%22 x=%2250%25%22 text-anchor=%22middle%22 fill=%22%2300d4ff%22 font-family=%22Arial%22 font-weight=%22bold%22>RH</text></svg>">
+<meta property="og:title" content="Rizuanul Haque — Cybersecurity Portfolio">
+<meta property="og:description" content="Security-focused IT professional with 4+ years in QA, CompTIA Security+, and hands-on SOC training. 5+ completed cybersecurity labs.">
+<meta property="og:image" content="https://rizuanul90.github.io/profile.png">
+<meta property="og:url" content="https://rizuanul90.github.io">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rizuanul Haque — Cybersecurity Portfolio">
+<meta name="twitter:description" content="Security-focused IT professional transitioning into cybersecurity.">
+<meta name="twitter:image" content="https://rizuanul90.github.io/profile.png">
 <link rel="stylesheet" href="style.css">
 <style>
   .hero {
@@ -300,12 +310,12 @@
     else if (isDeleting && charIndex === 0) { isDeleting = false; roleIndex = (roleIndex + 1) % roles.length; speed = 400; }
     setTimeout(type, speed);
   }
-  setTimeout(type, 1200);
+  document.fonts.ready.then(() => { setTimeout(type, 800); });
 
   // ── ROADMAP PROGRESS BARS ──
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.querySelectorAll('.roadmap-progress-fill').forEach(b => b.style.width = b.dataset.w + '%'); });
-  }, { threshold: 0.1 });
+  }, { rootMargin: '0px 0px -50px 0px', threshold: 0.05 });
   document.getElementById('roadmapTrack').querySelectorAll('.roadmap-item').forEach(item => obs.observe(item));
 </script>
 </body>
