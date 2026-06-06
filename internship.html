@@ -130,9 +130,9 @@
 </div>
 
 <div class="overview-grid">
-  <div class="ov-card"><div class="ov-icon">📅</div><div class="ov-num">1</div><div class="ov-lbl">Week Completed</div></div>
-  <div class="ov-card"><div class="ov-icon">✅</div><div class="ov-num">8</div><div class="ov-lbl">Deliverables Done</div></div>
-  <div class="ov-card"><div class="ov-icon">🛠</div><div class="ov-num">5</div><div class="ov-lbl">Resources Completed</div></div>
+  <div class="ov-card"><div class="ov-icon">📅</div><div class="ov-num">2</div><div class="ov-lbl">Weeks Completed</div></div>
+  <div class="ov-card"><div class="ov-icon">✅</div><div class="ov-num">16</div><div class="ov-lbl">Deliverables Done</div></div>
+  <div class="ov-card"><div class="ov-icon">🛠</div><div class="ov-num">10</div><div class="ov-lbl">Resources Completed</div></div>
   <div class="ov-card"><div class="ov-icon">🔐</div><div class="ov-num">Net</div><div class="ov-lbl">Security Focus</div></div>
   <div class="ov-card"><div class="ov-icon">🎯</div><div class="ov-num">SOC</div><div class="ov-lbl">Career Track</div></div>
 </div>
@@ -208,10 +208,95 @@
     </div>
   </div>
 
+
+  <!-- WEEK 2 -->
+  <div class="week-card" id="week2">
+    <div class="week-header" onclick="toggleWeek('week2')">
+      <span class="week-num">// Week 02</span>
+      <span class="week-title">Enterprise Protocol Deep Dive: Traffic Analysis, SOC Workflow & Detection Engineering</span>
+      <span class="week-date">May 2026</span>
+      <span class="week-status" style="background:rgba(0,255,157,.08);color:var(--accent2);border:1px solid rgba(0,255,157,.3);">✓ Complete</span>
+      <span class="week-chevron">▼</span>
+    </div>
+    <div class="week-body">
+      <div class="week-inner">
+
+        <div class="topic-banner">
+          <div class="topic-label">// Week 2 Topic</div>
+          <div class="topic-title">"Enterprise Protocol Deep Dive: Attacks, Detection &amp; Defence"</div>
+          <div class="topic-desc">Deep technical analysis of eight enterprise protocols routinely abused in cyberattacks — SMB, Kerberos, NTLM/LLMNR, RDP, DNS, WinRM, LDAP, and SSH. Each protocol covered: mechanics, offensive abuse techniques, MITRE ATT&amp;CK mapping, defensive detection opportunities, SIEM/EDR telemetry, hardening recommendations, and relevant CVEs. Supervised by Melissa Dixon and Hadyn Kuti. Completed May 29, 2026.</div>
+        </div>
+
+        <div class="section-head">// Completed Deliverables</div>
+        <div class="deliverables-grid">
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>Technical Research Report</strong>Full protocol deep dive across SMB, Kerberos, NTLM/LLMNR, RDP, DNS, WinRM, LDAP, SSH — with CVEs, MITRE ATT&amp;CK mapping, and ISO 27001 cross-reference matrix</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>Learning &amp; Reflection Summary</strong>Documented packet analysis techniques, IOC extraction methods, SOC triage workflow, detection engineering notes, and Sigma rule development</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>Traffic Analysis Lab — Carnage (TryHackMe)</strong>Full investigation: DNS C2 identification, HTTP C2 beaconing, timeline reconstruction, and kill chain mapping from PCAP</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>Traffic Analysis Lab — WebStrike (TryHackMe)</strong>Web-based attack investigation: identified malicious HTTP POST patterns, suspicious User-Agents, directory brute-force via 404 bursts</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>Wireshark Lab — Let'sDefend</strong>SOC analyst packet analysis: contextual triage, IOC extraction, and anomaly identification from real network captures</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>Intro to Network Traffic Analysis — HTB Academy</strong>Foundational NTA methodology: protocol dissection, stream following, behavioral IOC identification, tshark field extraction</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>Txdrop Lab</strong>Malware payload extraction using NetworkMiner and Wireshark Export Objects from PCAP files</div></div>
+          <div class="deliv-item"><span class="deliv-check dc-done">✓</span><div class="deliv-text"><strong>Sigma Rules Development</strong>Authored three detection rules: DNS query length anomaly (tunneling), Kerberoasting via RC4 encryption (Event 4769), LLMNR/NBT-NS poisoning (Event 4776)</div></div>
+        </div>
+
+        <div class="section-head">// Protocol Coverage — 8 Protocols Analyzed</div>
+        <ul class="breakdown-list">
+          <li class="breakdown-item"><span class="bd-num">SMB</span><div><div class="bd-title">Server Message Block — T1021.002</div><div class="bd-desc">Relay attacks via LLMNR poisoning + ntlmrelayx, EternalBlue (CVE-2017-0144), Pass-the-Hash, lateral movement via PsExec/smbexec. Key insight: SMB Signing is the single most impactful control against NTLM relay. Workstation-to-workstation SMB on port 445 is rarely legitimate — alert on this pattern.</div><span class="bd-risk">⚠ Detection: Event 4624 Logon Type 3, Zeek SMB logs, Impacket pipe names (svcctl, atsvc), SMBv1 traffic</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">KRB</span><div><div class="bd-title">Kerberos — T1558.003 · T1558.001</div><div class="bd-desc">Kerberoasting (RC4 TGS-REQ, Event 4769), AS-REP roasting, Pass-the-Ticket, Golden Ticket (forged TGT via krbtgt hash), Silver Ticket (forged Service Ticket — bypasses KDC entirely, no DC logs generated). Fix: enforce AES256, deploy gMSA with auto-rotating passwords.</div><span class="bd-risk">⚠ Detection: DC Event 4769 with TicketEncryptionType 0x17, honeypot SPN accounts, Microsoft Defender for Identity</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">NTLM</span><div><div class="bd-title">NTLM / LLMNR / NBT-NS — T1557.001</div><div class="bd-desc">Responder captures NTLMv2 hashes from multicast fallback queries. ntlmrelayx relays live authentication — NO cracking needed. Attack completes in real-time from initial access to authenticated lateral movement session.</div><span class="bd-risk">⚠ Detection: Event 4776 (NtLmSsp source), Zeek NTLM logs on modern OS, any host responding to LLMNR from non-DNS server</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">RDP</span><div><div class="bd-title">Remote Desktop Protocol — T1021.001 · T1563.002</div><div class="bd-desc">Brute force via Crowbar/Hydra, BlueKeep (CVE-2019-0708, CVSS 9.8, pre-auth wormable RCE), RDP session hijacking via tscon.exe from SYSTEM — no password required. Shodan 2025: ~4.7M hosts with port 3389 exposed to the internet.</div><span class="bd-risk">⚠ Detection: Event 4625 Logon Type 10 threshold, tscon.exe from SYSTEM or non-interactive parent, sessions at 02:00–05:00</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">DNS</span><div><div class="bd-title">DNS — T1071.004 · T1048.003</div><div class="bd-desc">Tunneling via iodine/dnscat2 encodes data in subdomain labels (Base32/64). C2 beaconing with consistent query intervals. Fast-flux C2 infrastructure. DNS-over-HTTPS creates visibility blind spots — 86% of malware uses DNS for C2 (Cisco Umbrella 2024). SUNBURST used DNS beaconing via avsvmcloud[.]com.</div><span class="bd-risk">⚠ Detection: dns.qry.name.len &gt; 50, NXDOMAIN rate &gt;20%, sustained bidirectional DNS stream to single domain, TXT queries to unknown external domains</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">WRM</span><div><div class="bd-title">WinRM / PowerShell Remoting — T1021.006</div><div class="bd-desc">Pass-the-Hash via evil-winrm, lateral movement using built-in Microsoft binaries (living-off-the-land), WinRM event subscriptions for persistence. HTTP (5985) is cleartext — SOAP payloads fully visible. Without PowerShell Script Block Logging (Event 4104), WinRM-delivered commands are nearly invisible.</div><span class="bd-risk">⚠ Detection: TCP 5985 from workstations, "evil-winrm" User-Agent in proxy logs, Event 4104 encoded commands</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">LDAP</span><div><div class="bd-title">LDAP / Active Directory — T1087.002</div><div class="bd-desc">BloodHound maps full AD attack paths using only legitimate LDAP read operations — any domain user can run it. ACL abuse chains minor permissions (GenericWrite → AddMember → DCSync) into domain compromise without exploiting any CVE. AD CS ESC attacks via LDAP enrolment. Present in &gt;85% of investigated intrusions (Mandiant 2024).</div><span class="bd-risk">⚠ Detection: Event 4662 mass object queries from workstations, Event 2889 unsigned LDAP binds, Microsoft Defender for Identity</span></div></li>
+          <li class="breakdown-item"><span class="bd-num">SSH</span><div><div class="bd-title">SSH — T1021.004 · T1572</div><div class="bd-desc">Pivoting via -L/-R/-D flags (local forward, remote forward, SOCKS proxy). authorized_keys persistence survives password changes. SSH agent hijacking to authenticate as original user to downstream hosts. regreSSHion (CVE-2024-6387) — pre-auth RCE, patched July 2024.</div><span class="bd-risk">⚠ Detection: ssh -D/-R flags in process args, new authorized_keys entries (FIM via Wazuh), sustained outbound TCP 22 from servers to external IPs</span></div></li>
+        </ul>
+
+        <div class="section-head">// Detection Engineering — Sigma Rules Authored</div>
+        <div class="mindset-grid">
+          <div class="mindset-card"><div class="mindset-num">// Rule 01 · Medium</div><div class="mindset-title">DNS Query Length Anomaly — Possible Tunneling</div><div class="mindset-desc">Detects DNS queries with query_length &gt; 60 chars, filtering known legitimate Microsoft domains. Tagged: attack.exfiltration · T1048.003 · T1071.004. Status: experimental.</div></div>
+          <div class="mindset-card"><div class="mindset-num">// Rule 02 · High</div><div class="mindset-title">Kerberoasting — RC4 Service Ticket Request</div><div class="mindset-desc">Detects Event ID 4769 with TicketEncryptionType 0x17 (RC4), excluding krbtgt. Indicates offline cracking attempt against service account hashes. Tagged: attack.credential_access · T1558.003. Status: stable.</div></div>
+          <div class="mindset-card"><div class="mindset-num">// Rule 03 · High</div><div class="mindset-title">LLMNR / NBT-NS Poisoning Activity</div><div class="mindset-desc">Detects Event ID 4776 with LogonProcess NtLmSsp from non-computer accounts. Indicates NTLM credential capture via LLMNR poisoning. Tagged: attack.credential_access · T1557.001. Status: experimental.</div></div>
+        </div>
+
+        <div class="section-head">// SOC Investigation Workflow Applied</div>
+        <div class="mindset-grid">
+          <div class="mindset-card"><div class="mindset-num">// Phase 01</div><div class="mindset-title">Alert Triage</div><div class="mindset-desc">Review SIEM/IDS alert in full — timestamp, severity, source/destination. Classify: True Positive / False Positive / Needs Investigation. Key insight: psexec.exe from a jump server at 10AM is expected; the same tool from a workstation at 2AM is an incident. Context is everything.</div></div>
+          <div class="mindset-card"><div class="mindset-num">// Phase 02</div><div class="mindset-title">Log Correlation</div><div class="mindset-desc">No single log source tells the full story. Correlate: DNS logs (C2 domains), proxy/HTTP logs (malicious payloads), Windows Event Logs (4624/4625/4688/4104), Firewall/NetFlow (lateral movement), EDR telemetry (process trees, memory injections), PCAP (ground truth).</div></div>
+          <div class="mindset-card"><div class="mindset-num">// Phase 03</div><div class="mindset-title">Timeline Reconstruction</div><div class="mindset-desc">Most impactful skill from Carnage and WebStrike labs. Sort all timestamped events chronologically to map kill chain phases. The earliest event is often the initial access vector. Example chain: T+0 DNS C2 → T+2 dropper download → T+5 PowerShell execution → T+10 LSASS dump → T+15 SMB lateral movement → T+45 data exfiltration.</div></div>
+        </div>
+
+        <div class="section-head">// Learning Resources — Completed</div>
+        <div class="resources-grid">
+          <a href="https://tryhackme.com/room/c2carnage" target="_blank" class="resource-card"><span class="rc-icon">🔍</span><div><div class="rc-name">Carnage — Traffic Analysis</div><div class="rc-sub">TryHackMe</div><span class="rc-status" style="background:rgba(0,255,157,.08);color:var(--accent2);border:1px solid rgba(0,255,157,.3);">✓ Completed</span></div></a>
+          <a href="https://tryhackme.com/room/webstrike" target="_blank" class="resource-card"><span class="rc-icon">🌐</span><div><div class="rc-name">WebStrike — HTTP Attack Analysis</div><div class="rc-sub">TryHackMe</div><span class="rc-status" style="background:rgba(0,255,157,.08);color:var(--accent2);border:1px solid rgba(0,255,157,.3);">✓ Completed</span></div></a>
+          <a href="https://app.letsdefend.io/training/lessons/wireshark-for-security-analysts" target="_blank" class="resource-card"><span class="rc-icon">🛡️</span><div><div class="rc-name">Wireshark for SOC Analysts</div><div class="rc-sub">Let'sDefend</div><span class="rc-status" style="background:rgba(0,255,157,.08);color:var(--accent2);border:1px solid rgba(0,255,157,.3);">✓ Completed</span></div></a>
+          <a href="https://academy.hackthebox.com/course/preview/intro-to-network-traffic-analysis" target="_blank" class="resource-card"><span class="rc-icon">📡</span><div><div class="rc-name">Intro to Network Traffic Analysis</div><div class="rc-sub">Hack The Box Academy</div><span class="rc-status" style="background:rgba(0,255,157,.08);color:var(--accent2);border:1px solid rgba(0,255,157,.3);">✓ Completed</span></div></a>
+          <a href="https://tryhackme.com/room/malwaretrafficanalysis" target="_blank" class="resource-card"><span class="rc-icon">🦠</span><div><div class="rc-name">Txdrop — Malware Traffic Analysis</div><div class="rc-sub">TryHackMe</div><span class="rc-status" style="background:rgba(0,255,157,.08);color:var(--accent2);border:1px solid rgba(0,255,157,.3);">✓ Completed</span></div></a>
+        </div>
+
+        <div class="section-head">// Key Takeaways</div>
+        <div class="mindset-grid">
+          <div class="mindset-card"><div class="mindset-num">// Insight 01</div><div class="mindset-title">Sophisticated Attackers Rarely Need Zero-Days</div><div class="mindset-desc">Week 2's central lesson: misconfigurations, weak credentials, and trusted protocols (DNS, SMB, Kerberos) are the real attack surface. BloodHound can map a path to Domain Admin using only legitimate LDAP read operations — no CVE required. The defender's advantage is visibility, baselining, and detecting the anomalies that even sophisticated attackers produce.</div></div>
+          <div class="mindset-card"><div class="mindset-num">// Insight 02</div><div class="mindset-title">Encryption Is Both Protection and a Blind Spot</div><div class="mindset-desc">TLS, HTTPS, DoH, SMBv3, and SSH all encrypt legitimate traffic and malicious traffic equally. Silver Tickets bypass the KDC entirely — no DC logs, only EDR catches them. DNS-over-HTTPS hides query content from network sensors. Enterprises must balance privacy with detection capability via TLS inspection and endpoint-based controls.</div></div>
+          <div class="mindset-card"><div class="mindset-num">// Insight 03</div><div class="mindset-title">Attacker Tools Are Often Admin Tools</div><div class="mindset-desc">PowerShell remoting, PsExec, BloodHound, and Nmap are all legitimate tools repurposed by attackers. Detection must understand context: who is running it, from where, at what time, against what target. Behavioural detection beats signature detection in living-off-the-land attack scenarios.</div></div>
+        </div>
+
+        <div class="section-head">// Skills &amp; Tools This Week</div>
+        <div class="skills-row">
+          <span class="tag">Wireshark</span><span class="tag">tshark</span><span class="tag">tcpdump</span><span class="tag">NetworkMiner</span><span class="tag">Zeek</span><span class="tag">PCAP Analysis</span><span class="tag">IOC Extraction</span>
+          <span class="tag green">TryHackMe Carnage</span><span class="tag green">TryHackMe WebStrike</span><span class="tag green">Let'sDefend Wireshark</span><span class="tag green">HTB NTA</span><span class="tag green">Txdrop Lab</span>
+          <span class="tag orange">Sigma Rule Authoring</span><span class="tag orange">MITRE ATT&amp;CK Mapping</span><span class="tag orange">SOC Triage Workflow</span><span class="tag orange">Threat Hunting</span><span class="tag orange">Detection Engineering</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- UPCOMING -->
   <div class="upcoming-card">
-    <p>📅 Week 2 and beyond will be added as the internship progresses — check back for updates</p>
+    <p>📅 Week 3 and beyond will be added as the internship progresses — check back for updates</p>
   </div>
+
 
 </div>
 
