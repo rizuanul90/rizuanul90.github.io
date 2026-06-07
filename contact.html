@@ -279,22 +279,23 @@
         <div class="form-row">
           <div class="form-group">
             <label for="firstName">First Name</label>
-            <input type="text" id="firstName" name="firstName" placeholder="John" required>
+            <input type="text" id="firstName" name="firstName" placeholder="John" required maxlength="50" autocomplete="given-name">
           </div>
           <div class="form-group">
             <label for="lastName">Last Name</label>
-            <input type="text" id="lastName" name="lastName" placeholder="Smith" required>
+            <input type="text" id="lastName" name="lastName" placeholder="Smith" required maxlength="50" autocomplete="family-name">
           </div>
         </div>
 
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="john@example.com" required>
+          <input type="email" id="email" name="email" placeholder="john@example.com" required maxlength="254" autocomplete="email">
         </div>
 
         <div class="form-group">
           <label for="message">Message</label>
-          <textarea id="message" name="message" placeholder="Hi Rizuanul, I'd like to connect about..." required></textarea>
+          <textarea id="message" name="message" placeholder="Hi Rizuanul, I'd like to connect about..." required maxlength="2000"></textarea>
+          <div id="charCount" style="font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);text-align:right;margin-top:4px;">0 / 2000</div>
         </div>
 
         <button type="submit" class="form-submit" id="submitBtn">
@@ -354,30 +355,131 @@
     if (e.key === 'Escape') closeModal();
   });
 
+  /* ── INPUT SANITIZATION ── */
+  function sanitize(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  }
+
+  /* ── VALIDATION RULES ── */
+  const RULES = {
+    firstName: {
+      maxLen: 50,
+      pattern: /^[a-zA-Z\s\-''.]{1,50}$/,
+      msg: 'First name: letters, spaces, hyphens only (max 50 chars)'
+    },
+    lastName: {
+      maxLen: 50,
+      pattern: /^[a-zA-Z\s\-''.]{1,50}$/,
+      msg: 'Last name: letters, spaces, hyphens only (max 50 chars)'
+    },
+    email: {
+      maxLen: 254,
+      pattern: /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/,
+      msg: 'Please enter a valid email address'
+    },
+    message: {
+      maxLen: 2000,
+      pattern: /^[\s\S]{10,2000}$/,
+      msg: 'Message must be between 10 and 2000 characters'
+    }
+  };
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.style.borderColor = '#e05c5c';
+    let err = el.parentElement.querySelector('.field-error');
+    if (!err) {
+      err = document.createElement('span');
+      err.className = 'field-error';
+      err.style.cssText = 'font-family:var(--font-mono);font-size:0.65rem;color:#e05c5c;margin-top:3px;display:block;';
+      el.parentElement.appendChild(err);
+    }
+    err.textContent = msg;
+  }
+
+  function clearError(id) {
+    const el = document.getElementById(id);
+    el.style.borderColor = '';
+    const err = el.parentElement.querySelector('.field-error');
+    if (err) err.remove();
+  }
+
+  /* clear errors on input */
+  ['firstName','lastName','email','message'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => clearError(id));
+  });
+
+  /* char counter */
+  const msgField = document.getElementById('message');
+  const charCount = document.getElementById('charCount');
+  if (msgField && charCount) {
+    msgField.addEventListener('input', () => {
+      const len = msgField.value.length;
+      charCount.textContent = len + ' / 2000';
+      charCount.style.color = len > 1800 ? '#e05c5c' : 'var(--muted)';
+    });
+  }
+
+  /* ── RATE LIMIT: max 3 submits per session ── */
+  let submitCount = 0;
+  const MAX_SUBMITS = 3;
+
   /* ── FORM SUBMIT ── */
   document.getElementById('contactForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     const txt = document.getElementById('submitText');
 
-    /* Basic validation */
-    const fields = ['firstName', 'lastName', 'email', 'message'];
+    /* Rate limit check */
+    if (submitCount >= MAX_SUBMITS) {
+      txt.textContent = 'Too many attempts — please email directly';
+      btn.disabled = true;
+      return;
+    }
+
+    /* Validate each field */
     let valid = true;
-    fields.forEach(id => {
+    Object.entries(RULES).forEach(([id, rule]) => {
       const el = document.getElementById(id);
-      if (!el.value.trim()) { el.style.borderColor = 'var(--accent3)'; valid = false; }
-      else el.style.borderColor = '';
+      const val = el.value.trim();
+
+      if (!val) {
+        showError(id, 'This field is required');
+        valid = false;
+      } else if (val.length > rule.maxLen) {
+        showError(id, rule.msg);
+        valid = false;
+      } else if (!rule.pattern.test(val)) {
+        showError(id, rule.msg);
+        valid = false;
+      } else {
+        clearError(id);
+      }
     });
     if (!valid) return;
 
+    /* Sanitize before submit */
+    const sanitizedData = new FormData();
+    sanitizedData.append('firstName', sanitize(document.getElementById('firstName').value.trim()));
+    sanitizedData.append('lastName',  sanitize(document.getElementById('lastName').value.trim()));
+    sanitizedData.append('email',     document.getElementById('email').value.trim().toLowerCase());
+    sanitizedData.append('message',   sanitize(document.getElementById('message').value.trim()));
+
     /* Submit */
+    submitCount++;
     btn.disabled = true;
     txt.textContent = 'Sending...';
 
     try {
       const res = await fetch(this.action, {
         method: 'POST',
-        body: new FormData(this),
+        body: sanitizedData,
         headers: { 'Accept': 'application/json' }
       });
 
@@ -385,6 +487,7 @@
         document.getElementById('formView').style.display = 'none';
         document.getElementById('successView').style.display = 'block';
         this.reset();
+        if (charCount) charCount.textContent = '0 / 2000';
       } else {
         txt.textContent = 'Error — please try again';
         btn.disabled = false;
