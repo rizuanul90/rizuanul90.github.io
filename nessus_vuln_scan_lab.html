@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nessus Vulnerability Scan Lab — Rizuanul Haque</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2215%22 fill=%22%230d1117%22/><text y=%22.9em%22 font-size=%2260%22 x=%2250%25%22 text-anchor=%22middle%22 fill=%22%2300d4ff%22 font-family=%22Arial%22 font-weight=%22bold%22>RH</text></svg>">
+<meta property="og:image" content="https://rizuanul90.github.io/profile.png">
+<meta property="og:type" content="website">
+<meta name="description" content="Nessus credentialed vulnerability scan against Metasploitable 2 — 63 vulnerabilities discovered including 6 Critical findings. Lab by Rizuanul Haque.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #21262d; --surface3: #2d333b;
+    --border: #30363d; --accent: #00d4ff; --accent2: #3fb950; --accent3: #ff6b35;
+    --accent4: #c084fc; --text: #e6edf3; --muted: #8b949e; --code-bg: #1c2128;
+    --font-head: 'Syne', sans-serif; --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace; --transition: 0.25s ease; --radius: 10px;
+  }
+  body.light {
+    --bg: #f6f8fa; --surface: #ffffff; --surface2: #f0f2f5; --surface3: #e8eaed;
+    --border: #d0d7de; --text: #1f2328; --muted: #656d76; --code-bg: #f6f8fa;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+
+  /* NAV */
+  nav { position: sticky; top: 0; z-index: 200; background: rgba(13,17,23,0.92); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 56px; display: flex; align-items: center; gap: 1rem; backdrop-filter: blur(12px); }
+  .nav-logo { font-family: var(--font-head); font-size: 1rem; font-weight: 800; color: var(--accent); text-decoration: none; }
+  .nav-sep { color: var(--border); }
+  .nav-title { font-family: var(--font-mono); font-size: 0.73rem; color: var(--muted); }
+  .nav-back { margin-left: auto; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-decoration: none; padding: 4px 12px; border: 1px solid var(--border); border-radius: 20px; transition: all 0.2s; }
+  .nav-back:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* HERO */
+  .hero { padding: 4rem 2rem 3rem; max-width: 900px; margin: 0 auto; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; }
+  .badge-blue   { background: rgba(0,212,255,0.08);   color: var(--accent);  border: 1px solid rgba(0,212,255,0.25); }
+  .badge-green  { background: rgba(63,185,80,0.08);   color: var(--accent2); border: 1px solid rgba(63,185,80,0.25); }
+  .badge-orange { background: rgba(255,107,53,0.08);  color: var(--accent3); border: 1px solid rgba(255,107,53,0.25); }
+  .badge-red    { background: rgba(248,81,73,0.1);    color: #f85149;        border: 1px solid rgba(248,81,73,0.3); }
+  .badge-purple { background: rgba(192,132,252,0.08); color: var(--accent4); border: 1px solid rgba(192,132,252,0.25); }
+  .lab-series { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+  .lab-series::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--accent2); }
+  h1 { font-family: var(--font-head); font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  h1 span { background: linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; color: var(--muted); font-size: 0.82rem; margin-bottom: 1.5rem; font-family: var(--font-mono); }
+  .hero-desc { font-size: 1rem; color: #b1bac4; max-width: 700px; border-left: 3px solid var(--accent); padding-left: 1.2rem; font-weight: 300; line-height: 1.8; }
+
+  /* LAYOUT */
+  .layout { max-width: 900px; margin: 0 auto; padding: 0 2rem 5rem; display: grid; grid-template-columns: 180px 1fr; gap: 3rem; align-items: start; }
+  .toc { position: sticky; top: 72px; font-size: 0.8rem; }
+  .toc-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+  .toc ol { list-style: none; }
+  .toc li { margin-bottom: 0.2rem; }
+  .toc a { color: var(--muted); text-decoration: none; display: block; padding: 4px 8px; border-left: 2px solid transparent; border-radius: 0 4px 4px 0; transition: all 0.2s; font-size: 0.75rem; line-height: 1.4; }
+  .toc a:hover { color: var(--accent); border-left-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .toc-divider { height: 1px; background: var(--border); margin: 0.6rem 0; }
+  .content section { margin-bottom: 3rem; scroll-margin-top: 80px; }
+
+  /* SECTION BANNER */
+  .section-banner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-start; position: relative; overflow: hidden; }
+  .section-banner::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, var(--accent), var(--accent2)); }
+  .section-banner-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .section-banner-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .section-banner-title { font-family: var(--font-head); font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 0.3rem; }
+  .section-banner-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  h2 { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.9rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text); }
+  h3 { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; color: var(--text); margin: 1.5rem 0 0.75rem; }
+  p { color: #b1bac4; font-size: 0.92rem; margin-bottom: 0.75rem; line-height: 1.7; }
+
+  /* STEP CARDS */
+  .step-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; transition: all var(--transition); position: relative; overflow: hidden; }
+  .step-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom,var(--accent),var(--accent2)); opacity: 0; transition: opacity var(--transition); }
+  .step-card:hover { border-color: rgba(0,212,255,0.3); transform: translateX(3px); }
+  .step-card:hover::before { opacity: 1; }
+  .step-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+  .step-badge { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); border-radius: 6px; padding: 2px 8px; flex-shrink: 0; }
+  .step-title { font-family: var(--font-head); font-size: 0.9rem; font-weight: 700; color: var(--text); }
+  .step-desc { font-size: 0.86rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.75rem; }
+
+  /* CODE BLOCKS */
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; margin: 0.75rem 0; overflow: hidden; }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 7px 1rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .code-lang { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.05em; }
+  .code-dots { display: flex; gap: 5px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f78166; } .dot-y { background: #d29922; } .dot-g { background: #3fb950; }
+  pre { padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.65; color: #79c0ff; }
+
+  /* CALLOUTS */
+  .callout { border: 1px solid rgba(0,212,255,0.2); background: rgba(0,212,255,0.05); border-radius: 8px; padding: 1rem 1.2rem; margin: 0.75rem 0; font-size: 0.88rem; color: #a5c8f8; line-height: 1.7; }
+  .callout strong { color: var(--accent); display: block; margin-bottom: 0.3rem; font-size: 0.72rem; font-family: var(--font-mono); letter-spacing: 0.08em; }
+  .callout.orange { border-color: rgba(255,107,53,0.2); background: rgba(255,107,53,0.05); color: #ffa657; }
+  .callout.orange strong { color: var(--accent3); }
+  .callout.green { border-color: rgba(63,185,80,0.2); background: rgba(63,185,80,0.05); color: #7ee787; }
+  .callout.green strong { color: var(--accent2); }
+  .callout.red { border-color: rgba(248,81,73,0.2); background: rgba(248,81,73,0.05); color: #ffa198; }
+  .callout.red strong { color: #f85149; }
+
+  /* VULN SEVERITY CARDS */
+  .vuln-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin: 1.25rem 0; }
+  .vuln-stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; }
+  .vuln-num { font-family: var(--font-head); font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 0.3rem; }
+  .vuln-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .vuln-stat.critical { border-color: rgba(248,81,73,0.4); }
+  .vuln-stat.critical .vuln-num { color: #f85149; }
+  .vuln-stat.critical .vuln-label { color: #f85149; }
+  .vuln-stat.high { border-color: rgba(255,107,53,0.4); }
+  .vuln-stat.high .vuln-num { color: var(--accent3); }
+  .vuln-stat.high .vuln-label { color: var(--accent3); }
+  .vuln-stat.medium { border-color: rgba(210,153,34,0.4); }
+  .vuln-stat.medium .vuln-num { color: #d29922; }
+  .vuln-stat.medium .vuln-label { color: #d29922; }
+  .vuln-stat.info { border-color: rgba(0,212,255,0.2); }
+  .vuln-stat.info .vuln-num { color: var(--accent); }
+  .vuln-stat.info .vuln-label { color: var(--accent); }
+
+  /* VULN FINDING ROWS */
+  .finding-list { display: flex; flex-direction: column; gap: 0.6rem; margin: 1rem 0; }
+  .finding-row { display: flex; align-items: flex-start; gap: 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1rem; }
+  .finding-row:hover { border-color: rgba(0,212,255,0.2); }
+  .sev-badge { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; letter-spacing: 0.04em; }
+  .sev-critical { background: rgba(248,81,73,0.15); color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+  .sev-high     { background: rgba(255,107,53,0.12); color: var(--accent3); border: 1px solid rgba(255,107,53,0.25); }
+  .sev-medium   { background: rgba(210,153,34,0.12); color: #d29922; border: 1px solid rgba(210,153,34,0.25); }
+  .finding-name { font-family: var(--font-head); font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
+  .finding-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+  .finding-cvss { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); margin-top: 0.25rem; }
+
+  /* TABLE */
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 1rem 0; border-radius: 8px; overflow: hidden; }
+  .comp-table th { background: var(--surface2); color: var(--muted); padding: 8px 12px; text-align: left; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .comp-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: #b1bac4; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: var(--surface2); }
+  .comp-table td:first-child { font-family: var(--font-mono); color: var(--accent); font-size: 0.8rem; }
+
+  /* SUMMARY CARD */
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-top: 1rem; }
+  .summary-card h3 { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); margin-bottom: 1rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .cmd-list { list-style: none; }
+  .cmd-list li { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+  .cmd-list li:last-child { border-bottom: none; }
+  .cmd-name { font-family: var(--font-mono); color: var(--accent); font-size: 0.75rem; min-width: 220px; flex-shrink: 0; word-break: break-all; }
+  .cmd-desc { color: var(--muted); }
+
+  footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+  .scroll-top { position: fixed; bottom: 2rem; right: 2rem; width: 38px; height: 38px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: all 0.2s; }
+  .scroll-top.visible { opacity: 1; }
+  .scroll-top:hover { border-color: var(--accent); color: var(--accent); }
+  @media (max-width:640px) { .layout { grid-template-columns: 1fr; } .toc { display: none; } .hero { padding: 2.5rem 1.25rem 2rem; } .vuln-grid { grid-template-columns: repeat(2,1fr); } }
+</style>
+<script src="particles.js" defer></script>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-title">nessus-vulnerability-scan-lab</span>
+  <a href="projects.html" class="nav-back">← Projects</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge-row">
+    <span class="badge badge-blue">Nessus Essentials</span>
+    <span class="badge badge-blue">Vulnerability Assessment</span>
+    <span class="badge badge-blue">Metasploitable 2</span>
+    <span class="badge badge-orange">Kali Linux</span>
+    <span class="badge badge-red">6 Critical Findings</span>
+    <span class="badge badge-purple">Metasploit Integration</span>
+    <span class="badge badge-green">✓ Completed</span>
+  </div>
+  <div class="lab-series">NPower NII Labworks · Vulnerability Assessment Lab</div>
+  <h1>Nessus <span>Vulnerability Scan</span></h1>
+  <div class="hero-meta">
+    <span>🔎 Vulnerability Assessment</span>
+    <span>📅 May 20, 2026</span>
+    <span>⏱ 6-minute scan</span>
+    <span>🎯 63 Vulnerabilities Discovered</span>
+  </div>
+  <p class="hero-desc">
+    Configured a credentialed Advanced Scan policy in Nessus Essentials and launched it against a Metasploitable 2 VM. Discovered 63 vulnerabilities across 6 severity levels — including 6 Critical findings such as an active UnrealIRCd backdoor, weak VNC authentication, and Apache Ghostcat. Integrated Nessus with Metasploit's <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent);">load nessus</code> plugin to launch and manage scans directly from msfconsole.
+  </p>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <aside class="toc">
+    <div class="toc-label">// Contents</div>
+    <ol>
+      <li><a href="#environment">01 — Environment</a></li>
+      <li><a href="#policy">02 — Scan Policy Config</a></li>
+      <li><a href="#msf-integration">03 — Metasploit Integration</a></li>
+      <li><a href="#results">04 — Scan Results</a></li>
+      <li><a href="#critical">05 — Critical Findings</a></li>
+      <li><a href="#high">06 — High Findings</a></li>
+      <li><a href="#takeaways">07 — Key Takeaways</a></li>
+      <li><a href="#commands">08 — Command Reference</a></li>
+    </ol>
+  </aside>
+
+  <div class="content">
+
+    <!-- 01 ENVIRONMENT -->
+    <section id="environment">
+      <div class="section-banner">
+        <div class="section-banner-icon">🖥️</div>
+        <div>
+          <div class="section-banner-label">// Section 01</div>
+          <div class="section-banner-title">Lab Environment</div>
+          <div class="section-banner-desc">Two-VM setup on the same virtual network — Kali Linux as the scanning host running Nessus Essentials, and Metasploitable 2 as the intentionally vulnerable target.</div>
+        </div>
+      </div>
+      <h2>Environment Setup</h2>
+      <table class="comp-table">
+        <thead><tr><th>Component</th><th>Role</th><th>Details</th></tr></thead>
+        <tbody>
+          <tr><td>Kali Linux</td><td>Attacker / Scanner Host</td><td>Running Nessus Essentials on localhost:8834 + Metasploit Framework</td></tr>
+          <tr><td>Metasploitable 2</td><td>Vulnerable Target</td><td>10.0.2.21 — intentionally misconfigured Linux VM</td></tr>
+          <tr><td>Nessus Essentials</td><td>Vulnerability Scanner</td><td>Tenable Nessus — credentialed Advanced Scan policy</td></tr>
+          <tr><td>Metasploit (msf6)</td><td>Scan Orchestration</td><td>Nessus plugin loaded via <code style="color:var(--accent)">load nessus</code> in msfconsole</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>// WHY CREDENTIALED SCANNING?</strong>
+        A credentialed scan authenticates directly to the target via SSH, giving Nessus access to installed packages, running services, and configuration files. This produces significantly more findings than an uncredentialed network scan and reflects real-world enterprise vulnerability management — where scanners are given credentials to get full visibility into host internals.
+      </div>
+    </section>
+
+    <!-- 02 POLICY CONFIG -->
+    <section id="policy">
+      <div class="section-banner">
+        <div class="section-banner-icon">⚙️</div>
+        <div>
+          <div class="section-banner-label">// Section 02</div>
+          <div class="section-banner-title">Advanced Scan Policy Configuration</div>
+          <div class="section-banner-desc">Built a custom scan policy named "Meta2" with full port range coverage, thorough assessment mode, web application scanning, and SSH credentials for authenticated host inspection.</div>
+        </div>
+      </div>
+      <h2>Scan Policy Configuration</h2>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-badge">Step 01</span>
+          <span class="step-title">Create Advanced Scan Policy (Meta2)</span>
+        </div>
+        <div class="step-desc">Navigated to Resources → Policies → New Policy and selected <strong>Advanced Scan</strong> from the Policy Templates. Named the policy "Meta2" to reflect the Metasploitable 2 target. Advanced Scan allows full configuration of all discovery, assessment, and reporting parameters without pre-set recommendations.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-badge">Step 02</span>
+          <span class="step-title">Discovery — Full Port Range (0-65535) + UDP</span>
+        </div>
+        <div class="step-desc">Under Discovery → Host Discovery, changed Destination Ports to <strong>0-65535</strong> and enabled <strong>UDP</strong> alongside TCP and ICMP. This ensures every port across both protocols is probed — a default scan only covers common ports and would miss services running on non-standard ports.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">nessus policy · port config</span><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div></div>
+          <pre>Destination Ports : 0-65535
+Ping Methods      : ARP ✓  TCP ✓  ICMP ✓  UDP ✓
+Port Scan Range   : 0-65535
+Network Port Scan : TCP ✓</pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-badge">Step 03</span>
+          <span class="step-title">Assessment — Thorough Tests + Web App Scanning</span>
+        </div>
+        <div class="step-desc">Under Assessment → General, enabled <strong>Perform thorough tests</strong>. This increases detection accuracy at the cost of scan speed and potential network disruption — acceptable in a controlled lab environment. Under Web Applications, toggled <strong>Scan web applications</strong> ON to detect web-layer vulnerabilities such as the Apache Ghostcat injection found in results.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-badge">Step 04</span>
+          <span class="step-title">Credentials — SSH Password Auth (msfadmin)</span>
+        </div>
+        <div class="step-desc">Under Credentials → SSH, changed Authentication Method from <strong>public key</strong> to <strong>password</strong> and entered <code style="font-family:var(--font-mono);color:var(--accent)">msfadmin</code> for both username and password. This gives Nessus authenticated access to the Metasploitable 2 host, enabling local checks for installed packages, configuration weaknesses, and service versions that are invisible to unauthenticated scans.</div>
+        <div class="callout orange">
+          <strong>// SECURITY NOTE</strong>
+          Nessus labels this field "Password (unsafe!)" because storing credentials in a scan policy creates a risk if the policy is exported or the Nessus instance is compromised. In production, SSH key-based authentication or a dedicated scan account with minimal privileges is the recommended approach.
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 METASPLOIT INTEGRATION -->
+    <section id="msf-integration">
+      <div class="section-banner">
+        <div class="section-banner-icon">🔗</div>
+        <div>
+          <div class="section-banner-label">// Section 03</div>
+          <div class="section-banner-title">Metasploit ↔ Nessus Integration</div>
+          <div class="section-banner-desc">Loaded the Nessus plugin inside msfconsole, connected to the Nessus API, created a new scan using the Meta2 policy UUID, and launched it — all without leaving the Metasploit console.</div>
+        </div>
+      </div>
+      <h2>Launching the Scan via Metasploit</h2>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-badge">Step 01</span>
+          <span class="step-title">Patch Nessus REST Library & Start Service</span>
+        </div>
+        <div class="step-desc">Before loading the plugin, applied a patch to the nessus_rest Ruby gem to support the protected API, then started the Nessus daemon.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div></div>
+          <pre>curl "https://raw.githubusercontent.com/QKaiser/nessus_rest-ruby/\
+nessus-protected-api-support/lib/nessus_rest.rb" \
+  > /usr/share/metasploit-framework/vendor/bundle/ruby/3.0.0/\
+gems/nessus_rest-0.1.6/lib/nessus_rest.rb
+
+service nessusd start</pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-badge">Step 02</span>
+          <span class="step-title">Load Nessus Plugin & Connect</span>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">msfconsole</span><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div></div>
+          <pre>msf6 > load nessus
+[*] Nessus Bridge for Metasploit
+[*] Type nessus_help for a command listing
+[*] Successfully loaded plugin: Nessus
+
+msf6 > nessus_connect admin:admin@localhost:8834</pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-badge">Step 03</span>
+          <span class="step-title">Create, Launch & Monitor Scan</span>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">msfconsole</span><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div></div>
+          <pre>msf6 > nessus_policy_list
+Policy ID  Name   Policy UUID
+4          Meta2  ad629e16-03b6-8c1d-cef6-ef8c9dd3c658d24bd260ef5f9e66
+
+msf6 > nessus_scan_new "ad629e16-03b6-8c1d-cef6-ef8c9dd3c658d24bd260ef5f9e66" \
+  "Meta2" "Scanning Meta2 for Vulns using Nessus" 10.0.2.21
+
+msf6 > nessus_scan_list
+Scan ID  Name   Owner  Status
+7        Meta2  bob    (not started)
+
+msf6 > nessus_scan_launch 7
+[+] Scan ID 7 successfully launched.
+
+msf6 > nessus_scan_list
+Scan ID  Name   Owner  Status   Folder
+7        Meta2  bob    running  3</pre>
+        </div>
+        <div class="callout green">
+          <strong>// RESULT</strong>
+          Scan completed in 6 minutes (9:01 PM → 9:07 PM, May 20). Nessus discovered 63 vulnerabilities across the Metasploitable 2 host at 10.0.2.21.
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 RESULTS OVERVIEW -->
+    <section id="results">
+      <div class="section-banner">
+        <div class="section-banner-icon">📊</div>
+        <div>
+          <div class="section-banner-label">// Section 04</div>
+          <div class="section-banner-title">Scan Results Overview</div>
+          <div class="section-banner-desc">63 total vulnerabilities discovered across all severity levels in a 6-minute credentialed scan of a single host.</div>
+        </div>
+      </div>
+      <h2>Vulnerability Summary</h2>
+      <div class="vuln-grid">
+        <div class="vuln-stat critical"><div class="vuln-num">6</div><div class="vuln-label">Critical</div></div>
+        <div class="vuln-stat high"><div class="vuln-num">4</div><div class="vuln-label">High</div></div>
+        <div class="vuln-stat medium"><div class="vuln-num">11</div><div class="vuln-label">Medium</div></div>
+        <div class="vuln-stat info"><div class="vuln-num">42</div><div class="vuln-label">Info / Mixed</div></div>
+      </div>
+      <div class="callout">
+        <strong>// SCAN DETAILS</strong>
+        Policy: Advanced Scan · Status: Completed · Severity Base: CVSS v3.0 · Scanner: Local Scanner · Target: 10.0.2.21 (Metasploitable 2) · Elapsed: 6 minutes
+      </div>
+    </section>
+
+    <!-- 05 CRITICAL FINDINGS -->
+    <section id="critical">
+      <div class="section-banner">
+        <div class="section-banner-icon">🚨</div>
+        <div>
+          <div class="section-banner-label">// Section 05</div>
+          <div class="section-banner-title">Critical Findings</div>
+          <div class="section-banner-desc">6 Critical vulnerabilities — all exploitable remotely, most leading to full system compromise without credentials.</div>
+        </div>
+      </div>
+      <h2>Critical Vulnerabilities</h2>
+      <div class="finding-list">
+
+        <div class="finding-row">
+          <span class="sev-badge sev-critical">CRITICAL</span>
+          <div>
+            <div class="finding-name">UnrealIRCd Backdoor Detection</div>
+            <div class="finding-desc">UnrealIRCd 3.2.8.1 ships with a compiled-in backdoor that allows unauthenticated remote command execution. Any attacker who sends a specially crafted string to the IRC port gets a root shell. This is one of the most well-known Metasploitable findings and a direct path to full system compromise. Exploitable via Metasploit module <code style="font-family:var(--font-mono);color:var(--accent);font-size:0.8em">exploit/unix/irc/unreal_ircd_3281_backdoor</code>.</div>
+            <div class="finding-cvss">CVSS: 10.0 · Family: Backdoors · No auth required</div>
+          </div>
+        </div>
+
+        <div class="finding-row">
+          <span class="sev-badge sev-critical">CRITICAL</span>
+          <div>
+            <div class="finding-name">VNC Server 'password' Password</div>
+            <div class="finding-desc">The VNC server running on Metasploitable 2 uses the literal password "password" — detectable and exploitable by Nessus automatically during the credentialed scan. An attacker with network access gets direct graphical desktop access to the system without needing any prior foothold.</div>
+            <div class="finding-cvss">CVSS: 10.0 · Family: Gain a shell remotely · Weak credential</div>
+          </div>
+        </div>
+
+        <div class="finding-row">
+          <span class="sev-badge sev-critical">CRITICAL</span>
+          <div>
+            <div class="finding-name">Canonical Ubuntu Linux SEoL (8.04.x)</div>
+            <div class="finding-desc">Metasploitable 2 runs Ubuntu 8.04 — a version that reached End of Life in May 2013. No security patches have been issued for over a decade, meaning every vulnerability discovered since 2013 affecting this OS version is permanently unpatched on this host.</div>
+            <div class="finding-cvss">CVSS: 10.0 · Family: General · No patch available</div>
+          </div>
+        </div>
+
+        <div class="finding-row">
+          <span class="sev-badge sev-critical">CRITICAL</span>
+          <div>
+            <div class="finding-name">Apache Tomcat AJP Connector Request Injection (Ghostcat)</div>
+            <div class="finding-desc">CVE-2020-1938 — a critical vulnerability in the Apache JServ Protocol (AJP) connector. Allows an unauthenticated attacker to read files from the web application and achieve remote code execution if file upload is enabled. The AJP connector (port 8009) was left exposed with no authentication.</div>
+            <div class="finding-cvss">CVSS: 9.8 · Family: Web Servers · CVE-2020-1938</div>
+          </div>
+        </div>
+
+        <div class="finding-row">
+          <span class="sev-badge sev-critical">CRITICAL</span>
+          <div>
+            <div class="finding-name">SSL Version 2 and 3 Protocol Detection</div>
+            <div class="finding-desc">SSLv2 and SSLv3 are cryptographically broken protocols. SSLv3 is vulnerable to POODLE (CVE-2014-3566). Both are susceptible to MITM attacks that can decrypt traffic or inject malicious content. Multiple services on the host were found serving these deprecated protocol versions.</div>
+            <div class="finding-cvss">CVSS: 9.8 · Family: Service detection · Count: 2 instances</div>
+          </div>
+        </div>
+
+        <div class="finding-row">
+          <span class="sev-badge sev-critical">CRITICAL</span>
+          <div>
+            <div class="finding-name">SSL (Multiple Issues)</div>
+            <div class="finding-desc">Nessus grouped multiple SSL/TLS misconfigurations under this finding — including expired certificates, weak cipher suites, and certificate chain issues. These create opportunities for MITM attacks and traffic decryption across any service using SSL/TLS on the host.</div>
+            <div class="finding-cvss">CVSS: — · Family: Gain a shell remotely · Count: 3 instances</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 06 HIGH FINDINGS -->
+    <section id="high">
+      <div class="section-banner">
+        <div class="section-banner-icon">⚠️</div>
+        <div>
+          <div class="section-banner-label">// Section 06</div>
+          <div class="section-banner-title">High Severity Findings</div>
+          <div class="section-banner-desc">4 High severity vulnerabilities — each providing meaningful access or attack surface expansion to an attacker already on the network.</div>
+        </div>
+      </div>
+      <h2>High Vulnerabilities</h2>
+      <div class="finding-list">
+
+        <div class="finding-row">
+          <span class="sev-badge sev-high">HIGH</span>
+          <div>
+            <div class="finding-name">NFS Shares World Readable</div>
+            <div class="finding-desc">The NFS server exports file shares that are accessible to any host on the network without authentication. An attacker can mount these shares and read (or potentially write) sensitive files — a common path to credential theft or persistence.</div>
+            <div class="finding-cvss">CVSS: 7.5 · Family: RPC</div>
+          </div>
+        </div>
+
+        <div class="finding-row">
+          <span class="sev-badge sev-high">HIGH</span>
+          <div>
+            <div class="finding-name">Samba Badlock Vulnerability</div>
+            <div class="finding-desc">CVE-2016-2118 — a man-in-the-middle vulnerability in Samba's DCERPC authentication. Allows an attacker to intercept and modify Samba/Windows SMB traffic. On Metasploitable 2 the Samba version is outdated and unpatched, leaving this exploitable without elevated privileges.</div>
+            <div class="finding-cvss">CVSS: 7.5 · Family: General</div>
+          </div>
+        </div>
+
+        <div class="finding-row">
+          <span class="sev-badge sev-high">HIGH</span>
+          <div>
+            <div class="finding-name">rlogin Service Detection</div>
+            <div class="finding-desc">The rlogin service (port 513) is active — a legacy remote login protocol with no encryption and weak authentication using .rhosts trust files. An attacker can potentially log in without a password if trust relationships are misconfigured, which they are on Metasploitable 2.</div>
+            <div class="finding-cvss">CVSS: 7.5 · Family: Service detection</div>
+          </div>
+        </div>
+
+        <div class="finding-row">
+          <span class="sev-badge sev-high">HIGH</span>
+          <div>
+            <div class="finding-name">rsh Service Detection</div>
+            <div class="finding-desc">The rsh (remote shell) service is active alongside rlogin. Both protocols transmit all data in cleartext and rely on IP-based trust — making them trivially exploitable for credential theft and remote command execution on any network where the attacker can intercept or spoof traffic.</div>
+            <div class="finding-cvss">CVSS: 7.5 · Family: Service detection</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 07 TAKEAWAYS -->
+    <section id="takeaways">
+      <div class="section-banner">
+        <div class="section-banner-icon">🧠</div>
+        <div>
+          <div class="section-banner-label">// Section 07</div>
+          <div class="section-banner-title">Key Takeaways — Defender Perspective</div>
+          <div class="section-banner-desc">What this scan revealed about the gap between "running services" and "secure infrastructure."</div>
+        </div>
+      </div>
+      <h2>Defensive Analysis</h2>
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Lesson 01</span><span class="step-title">Credentialed Scans Are Not Optional</span></div>
+        <div class="step-desc">An uncredentialed network scan of this host would have found far fewer findings. The OS End-of-Life status, installed package versions, and configuration file weaknesses are only visible once Nessus can authenticate and inspect the host internals. In enterprise environments, scan coverage without credentials is fundamentally incomplete.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Lesson 02</span><span class="step-header"><span class="step-title">Legacy Protocols Are Active Attack Surface</span></span></div>
+        <div class="step-desc">rlogin, rsh, Telnet, and SSLv2/v3 were all actively running on this host. These protocols were designed in an era before adversarial networks — they have no encryption, weak or no authentication, and well-documented exploitation paths. Their presence on any modern network is an immediate finding that requires remediation, not just documentation.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Lesson 03</span><span class="step-title">A Backdoor Is the Worst Possible Finding</span></div>
+        <div class="step-desc">The UnrealIRCd backdoor represents a supply chain compromise — malicious code shipped inside a legitimate software package. A defender seeing this finding in a production environment must treat it as an active incident, not a patch management task. Any host running UnrealIRCd 3.2.8.1 should be assumed compromised and isolated immediately pending forensic analysis.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Lesson 04</span><span class="step-title">End-of-Life OS Is a Multiplier, Not a Finding</span></div>
+        <div class="step-desc">Ubuntu 8.04 reaching EOL doesn't appear in CVSS scores — but it multiplies the impact of every other finding on the host. Every vulnerability discovered since 2013 that affects this OS is permanently unpatched. Treating EOL operating systems as just another medium finding understates the risk significantly.</div>
+      </div>
+    </section>
+
+    <!-- 08 COMMAND REFERENCE -->
+    <section id="commands">
+      <h2>Command Reference</h2>
+      <div class="summary-card">
+        <h3>// Metasploit Nessus Plugin Commands</h3>
+        <ul class="cmd-list">
+          <li><span class="cmd-name">load nessus</span><span class="cmd-desc">Load the Nessus bridge plugin inside msfconsole</span></li>
+          <li><span class="cmd-name">nessus_connect admin:admin@localhost:8834</span><span class="cmd-desc">Connect to the Nessus API on localhost</span></li>
+          <li><span class="cmd-name">nessus_policy_list</span><span class="cmd-desc">List all available scan policies and their UUIDs</span></li>
+          <li><span class="cmd-name">nessus_scan_new &lt;UUID&gt; &lt;name&gt; &lt;desc&gt; &lt;target&gt;</span><span class="cmd-desc">Create a new scan using a policy UUID against a target IP</span></li>
+          <li><span class="cmd-name">nessus_scan_list</span><span class="cmd-desc">List all scans and their current status (running/completed)</span></li>
+          <li><span class="cmd-name">nessus_scan_launch &lt;scan_id&gt;</span><span class="cmd-desc">Launch a created scan by its Scan ID</span></li>
+          <li><span class="cmd-name">nessus_scan_details &lt;id&gt; host</span><span class="cmd-desc">View per-host vulnerability breakdown by severity</span></li>
+          <li><span class="cmd-name">nessus_report_vulns &lt;id&gt;</span><span class="cmd-desc">List all vulnerabilities found in a completed scan</span></li>
+          <li><span class="cmd-name">service nessusd start</span><span class="cmd-desc">Start the Nessus daemon from the terminal (Bash)</span></li>
+        </ul>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Nessus Vulnerability Scan Lab · NPower NII Labworks</p>
+</footer>
+<button class="scroll-top" id="scrollTop">↑</button>
+
+<script>
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light') document.body.classList.add('light');
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
