@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XSS & Burp Suite Proxy Lab — Rizuanul Haque</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2215%22 fill=%22%230d1117%22/><text y=%22.9em%22 font-size=%2260%22 x=%2250%25%22 text-anchor=%22middle%22 fill=%22%2300d4ff%22 font-family=%22Arial%22 font-weight=%22bold%22>RH</text></svg>">
+<meta property="og:image" content="https://rizuanul90.github.io/profile.png">
+<meta property="og:type" content="website">
+<meta name="description" content="Cross-Site Scripting (XSS) lab using Burp Suite and FoxyProxy — parameter escaping, input validation, and reflected XSS exploitation by Rizuanul Haque.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #21262d; --surface3: #2d333b;
+    --border: #30363d; --accent: #00d4ff; --accent2: #3fb950; --accent3: #ff6b35;
+    --accent4: #c084fc; --text: #e6edf3; --muted: #8b949e; --code-bg: #1c2128;
+    --font-head: 'Syne', sans-serif; --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace; --transition: 0.25s ease; --radius: 10px;
+  }
+
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+
+  /* NAV */
+  nav { position: sticky; top: 0; z-index: 200; background: rgba(13,17,23,0.92); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 56px; display: flex; align-items: center; gap: 1rem; backdrop-filter: blur(12px); }
+  .nav-logo { font-family: var(--font-head); font-size: 1rem; font-weight: 800; background: linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+  .nav-sep { color: var(--border); }
+  .nav-title { font-family: var(--font-mono); font-size: 0.73rem; color: var(--muted); }
+  .nav-back { margin-left: auto; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-decoration: none; padding: 4px 12px; border: 1px solid var(--border); border-radius: 20px; transition: all 0.2s; }
+  .nav-back:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* HERO */
+  .hero { padding: 4rem 2rem 3rem; max-width: 900px; margin: 0 auto; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; }
+  .badge-blue { background: rgba(0,212,255,0.08); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
+  .badge-green { background: rgba(63,185,80,0.08); color: var(--accent2); border: 1px solid rgba(63,185,80,0.25); }
+  .badge-orange { background: rgba(255,107,53,0.08); color: var(--accent3); border: 1px solid rgba(255,107,53,0.25); }
+  .badge-purple { background: rgba(192,132,252,0.08); color: var(--accent4); border: 1px solid rgba(192,132,252,0.25); }
+
+  .lab-series { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+  .lab-series::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--accent2); }
+
+  h1 { font-family: var(--font-head); font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  h1 span { background: linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; color: var(--muted); font-size: 0.82rem; margin-bottom: 1.5rem; font-family: var(--font-mono); }
+  .hero-desc { font-size: 1rem; color: #b1bac4; max-width: 700px; border-left: 3px solid var(--accent); padding-left: 1.2rem; font-weight: 300; line-height: 1.8; }
+
+  /* LAYOUT */
+  .layout { max-width: 900px; margin: 0 auto; padding: 0 2rem 5rem; display: grid; grid-template-columns: 180px 1fr; gap: 3rem; align-items: start; }
+
+  /* TOC */
+  .toc { position: sticky; top: 72px; font-size: 0.8rem; }
+  .toc-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+  .toc ol { list-style: none; }
+  .toc li { margin-bottom: 0.2rem; }
+  .toc a { color: var(--muted); text-decoration: none; display: block; padding: 4px 8px; border-left: 2px solid transparent; border-radius: 0 4px 4px 0; transition: all 0.2s; font-size: 0.75rem; line-height: 1.4; }
+  .toc a:hover { color: var(--accent); border-left-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .toc-divider { height: 1px; background: var(--border); margin: 0.6rem 0; }
+
+  /* SECTIONS */
+  .content section { margin-bottom: 3rem; scroll-margin-top: 80px; }
+  .section-banner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-start; position: relative; overflow: hidden; }
+  .section-banner::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, var(--accent), var(--accent2)); }
+  .section-banner-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .section-banner-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .section-banner-title { font-family: var(--font-head); font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 0.3rem; }
+  .section-banner-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  .step-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; }
+  h2 { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.9rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text); }
+  h3 { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; color: var(--text); margin: 1.5rem 0 0.75rem; }
+  p { color: #b1bac4; font-size: 0.92rem; margin-bottom: 0.75rem; line-height: 1.7; }
+
+  /* STEP CARDS */
+  .step-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; transition: all var(--transition); position: relative; overflow: hidden; }
+  .step-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom,var(--accent),var(--accent2)); opacity: 0; transition: opacity var(--transition); }
+  .step-card:hover { border-color: rgba(0,212,255,0.3); transform: translateX(3px); }
+  .step-card:hover::before { opacity: 1; }
+  .step-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+  .step-badge { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); border-radius: 6px; padding: 2px 8px; flex-shrink: 0; }
+  .step-title { font-family: var(--font-head); font-size: 0.9rem; font-weight: 700; color: var(--text); }
+  .step-desc { font-size: 0.86rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.75rem; }
+
+  /* CODE BLOCKS */
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; margin: 0.75rem 0; overflow: hidden; }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 7px 1rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .code-lang { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.05em; }
+  .code-dots { display: flex; gap: 5px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f78166; } .dot-y { background: #d29922; } .dot-g { background: #3fb950; }
+  pre { padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.65; color: #79c0ff; }
+  .cmd { color: #79c0ff; } .flag { color: #ffa657; } .path { color: #a5d6ff; }
+  .cm { color: #6e7681; font-style: italic; } .val { color: #56d364; }
+
+  /* CALLOUT */
+  .callout { border: 1px solid rgba(0,212,255,0.2); background: rgba(0,212,255,0.05); border-radius: 8px; padding: 1rem 1.2rem; margin: 0.75rem 0; font-size: 0.88rem; color: #a5c8f8; line-height: 1.7; }
+  .callout strong { color: var(--accent); display: block; margin-bottom: 0.3rem; font-size: 0.72rem; font-family: var(--font-mono); letter-spacing: 0.08em; }
+  .callout.green { border-color: rgba(63,185,80,0.2); background: rgba(63,185,80,0.05); color: #7ee787; }
+  .callout.green strong { color: var(--accent2); }
+  .callout.orange { border-color: rgba(255,107,53,0.2); background: rgba(255,107,53,0.05); color: #ffa657; }
+  .callout.orange strong { color: var(--accent3); }
+  .callout.purple { border-color: rgba(192,132,252,0.2); background: rgba(192,132,252,0.05); color: #d2a8ff; }
+  .callout.purple strong { color: var(--accent4); }
+  .callout.red { border-color: rgba(248,81,73,0.25); background: rgba(248,81,73,0.06); color: #ffa198; }
+  .callout.red strong { color: #f85149; }
+
+  /* SUMMARY CARD */
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-top: 1rem; }
+  .summary-card h3 { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); margin-bottom: 1rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .cmd-list { list-style: none; }
+  .cmd-list li { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+  .cmd-list li:last-child { border-bottom: none; }
+  .cmd-name { font-family: var(--font-mono); color: var(--accent); font-size: 0.75rem; min-width: 200px; flex-shrink: 0; word-break: break-all; }
+  .cmd-desc { color: var(--muted); }
+
+  /* COMPONENT TABLE */
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 1rem 0; border-radius: 8px; overflow: hidden; }
+  .comp-table th { background: var(--surface2); color: var(--muted); padding: 8px 12px; text-align: left; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .comp-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: #b1bac4; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: var(--surface2); }
+  .comp-table td:first-child { font-family: var(--font-mono); color: var(--accent); font-size: 0.8rem; }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  .scroll-top { position: fixed; bottom: 2rem; right: 2rem; width: 38px; height: 38px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: all 0.2s; }
+  .scroll-top.visible { opacity: 1; }
+  .scroll-top:hover { border-color: var(--accent); color: var(--accent); }
+
+  @media (max-width:640px) { .layout { grid-template-columns: 1fr; } .toc { display: none; } .hero { padding: 2.5rem 1.25rem 2rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-title">xss-burpsuite-lab</span>
+  <a href="projects.html" class="nav-back">← Projects</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge-row">
+    <span class="badge badge-purple">XSS</span>
+    <span class="badge badge-blue">Burp Suite</span>
+    <span class="badge badge-blue">FoxyProxy</span>
+    <span class="badge badge-orange">Input Validation</span>
+    <span class="badge badge-green">✓ Completed</span>
+  </div>
+  <div class="lab-series">Web Application Security · Lab</div>
+  <h1>XSS & <span>Burp Suite</span> Proxy Lab</h1>
+  <div class="hero-meta">
+    <span>🌐 Web App Security</span>
+    <span>🛠 Kali Linux / Burp Suite</span>
+    <span>🎯 Parameter Escaping</span>
+    <span>🔍 Input Validation</span>
+    <span>👨‍🏫 Participant: Rizuanul Haque</span>
+  </div>
+  <p class="hero-desc">
+    Configured Burp Suite as an intercepting proxy with FoxyProxy in Firefox, then exploited Reflected Cross-Site Scripting across multiple HTML injection contexts — body parameter, title tag, and HTML comment — using Google's Public Firing Range testbed. Also bypassed a tag-based input filter using an SVG event handler, demonstrating why blocklist-style validation isn't sufficient defense.
+  </p>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#setup">Part 1 — Proxy Setup</a></li>
+      <li><a href="#body-param">Part 2 — Body Parameter</a></li>
+      <li><a href="#title-param">Part 3 — Title Tag</a></li>
+      <li><a href="#comment-tag">Part 4 — Comment & Filter Bypass</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ol>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- OVERVIEW -->
+    <section id="overview">
+      <span class="step-num">// Overview</span>
+      <h2>What Is Cross-Site Scripting?</h2>
+      <p>Cross-Site Scripting (XSS) is a web vulnerability where an attacker injects malicious scripts into content that other users' browsers will render. It happens when an application takes untrusted input and includes it in the HTML response without proper validation or output encoding. Reflected XSS — the type covered in this lab — is non-persistent: the payload travels in a URL and executes the moment a victim opens that link.</p>
+
+      <table class="comp-table">
+        <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Burp Suite Community</td><td>Intercept, inspect, and modify HTTP requests before they reach the server</td></tr>
+          <tr><td>FoxyProxy (Firefox)</td><td>Route browser traffic through Burp's proxy listener on 127.0.0.1:8080</td></tr>
+          <tr><td>Public Firing Range</td><td>Google's intentionally vulnerable web app — a safe, legal XSS testbed</td></tr>
+          <tr><td>Kali Linux</td><td>Attack platform — Burp and Firefox are pre-installed</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <strong>// WHY THIS MATTERS</strong>
+        XSS sits in the OWASP Top 10 and remains one of the most common web app vulnerabilities. A successful exploit can steal session cookies, hijack accounts, or redirect users to phishing pages — all from a single malicious link. This lab focuses on understanding *why* each context behaves differently, since that's the foundation for writing effective input validation and output encoding rules.
+      </div>
+    </section>
+
+    <!-- PART 1: PROXY SETUP -->
+    <section id="setup">
+      <div class="section-banner">
+        <span class="section-banner-icon">🛰️</span>
+        <div>
+          <div class="section-banner-label">// Part 1 of 4</div>
+          <div class="section-banner-title">Burp Suite & Proxy Setup</div>
+          <div class="section-banner-desc">Launch Burp Suite, install FoxyProxy in Firefox, and import Burp's CA certificate so HTTPS traffic can be intercepted and decrypted.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 01</span><span class="step-title">Launch Burp Suite on Kali Linux</span></div>
+        <div class="step-desc">Open the Kali application menu and search for <strong>Burpsuite</strong>. Click the dragon icon to launch.</div>
+        <div class="step-desc">If a JRE compatibility warning appears, check "Don't show again" and click OK. On the Terms & Conditions screen, click the orange <strong>I Accept</strong> button. When prompted, select <strong>Temporary project</strong> and click <strong>Next</strong>, then leave the configuration as Burp defaults and click <strong>Start Burp</strong>.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 02</span><span class="step-title">Install FoxyProxy in Firefox</span></div>
+        <div class="step-desc">Open Firefox in the Kali VM and search for <strong>FoxyProxy Basic</strong>. Click the Mozilla Add-ons result, click <strong>Add to Firefox</strong>, and confirm the install prompt.</div>
+        <div class="step-desc">Click the fox icon in the toolbar → <strong>Options</strong> → <strong>Add</strong>, and configure a new proxy entry pointing at Burp's default listener:</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">foxyproxy config</span></div>
+          <pre><span class="cm"># Title</span>             <span class="val">Burp</span>
+<span class="cm"># Proxy Type</span>        <span class="val">HTTP</span>
+<span class="cm"># Proxy IP Address</span>  <span class="val">127.0.0.1</span>
+<span class="cm"># Port</span>              <span class="val">8080</span></pre>
+        </div>
+        <div class="step-desc">Click <strong>Save</strong>, then click the fox icon again and select <strong>Burp</strong> to route all traffic through the proxy.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 03</span><span class="step-title">Import Burp's CA Certificate</span></div>
+        <div class="step-desc">With FoxyProxy set to Burp, browse to <code style="font-family:var(--font-mono);color:var(--accent)">http://burpsuite</code>, then click <strong>CA Certificate</strong> in the top right to download <code style="font-family:var(--font-mono)">cacert.der</code>.</div>
+        <div class="step-desc">In Firefox, open the menu (☰) → <strong>Settings</strong> → search <strong>certificate</strong> → <strong>View Certificates</strong> → <strong>Import</strong>. Select the downloaded file, check both trust boxes, and click OK.</div>
+        <div class="callout">
+          <strong>// WHY IMPORT THE CA CERTIFICATE?</strong>
+          Burp generates its own TLS certificates on the fly to sit between the browser and the target server. Without trusting Burp's CA, Firefox rejects every HTTPS connection that passes through the proxy — importing the PortSwigger CA lets Firefox accept those certificates so encrypted traffic can still be inspected.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 2: BODY PARAM -->
+    <section id="body-param">
+      <div class="section-banner">
+        <span class="section-banner-icon">📝</span>
+        <div>
+          <div class="section-banner-label">// Part 2 of 4</div>
+          <div class="section-banner-title">Reflected XSS — Body Parameter</div>
+          <div class="section-banner-desc">The simplest injection context: the parameter value is reflected straight into the HTML &lt;body&gt; with no encoding, so a raw &lt;script&gt; tag executes as-is.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 04</span><span class="step-title">Open Reflected XSS → Parameter – Body</span></div>
+        <div class="step-desc">Navigate to <code style="font-family:var(--font-mono);color:var(--accent)">https://public-firing-range.appspot.com</code> and click <strong>Reflected XSS</strong>. In Burp, go to <strong>Proxy → Intercept</strong> and click <strong>Intercept is on</strong>. Back in the browser, click <strong>Parameter – Body</strong>.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 05</span><span class="step-title">Send the Intercepted Request to Repeater</span></div>
+        <div class="step-desc">Burp pauses the request — a GET to <code style="font-family:var(--font-mono);color:var(--accent)">/reflected/parameter/body?q=a</code>. Right-click it and select <strong>Send to Repeater</strong> (Ctrl+R), then switch to the Repeater tab and click <strong>Send</strong>.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">response (excerpt)</span></div>
+          <pre>&lt;html&gt;
+  &lt;body&gt;
+    a
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+        </div>
+        <div class="step-desc">The value <code style="font-family:var(--font-mono);color:var(--accent)">a</code> from the <code style="font-family:var(--font-mono);color:var(--accent)">q</code> parameter lands directly inside the <code style="font-family:var(--font-mono)">&lt;body&gt;</code> with zero encoding.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 06</span><span class="step-title">Inject the Script Payload</span></div>
+        <div class="step-desc">In the Repeater request, replace <code style="font-family:var(--font-mono);color:var(--accent)">a</code> with a script tag and resend:</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">modified request</span></div>
+          <pre>GET /reflected/parameter/body?q=<span class="val">&lt;script&gt;alert(1)&lt;/script&gt;</span> HTTP/2</pre>
+        </div>
+        <div class="step-desc">The response now reflects the script tag unescaped inside the body. Right-click the response → <strong>Copy URL</strong>, return to Proxy and turn off intercept, then paste the URL into a new tab.</div>
+        <div class="callout green">
+          <strong>// XSS CONFIRMED — BODY PARAMETER</strong>
+          The browser parses and executes the injected <code style="font-family:var(--font-mono)">&lt;script&gt;</code> tag, popping an alert. In a real attack, this payload would be swapped for cookie exfiltration, a credential-harvesting redirect, or a beacon to an attacker-controlled server.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 3: TITLE TAG -->
+    <section id="title-param">
+      <div class="section-banner">
+        <span class="section-banner-icon">🏷️</span>
+        <div>
+          <div class="section-banner-label">// Part 3 of 4</div>
+          <div class="section-banner-title">Reflected XSS — Title Tag Context</div>
+          <div class="section-banner-desc">When input lands inside an existing tag like &lt;title&gt;, a bare &lt;script&gt; injection is treated as plain text. The tag has to be closed first before the script can execute.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 07</span><span class="step-title">Intercept the Title Parameter</span></div>
+        <div class="step-desc">Re-enable intercept in Burp, then click <strong>Parameter – Title</strong> on the Reflected XSS page. Send the request to Repeater and click Send.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">response (excerpt)</span></div>
+          <pre>&lt;head&gt;
+  &lt;title&gt;
+    a
+  &lt;/title&gt;
+&lt;/head&gt;</pre>
+        </div>
+        <div class="step-desc">This time the value sits inside <code style="font-family:var(--font-mono)">&lt;title&gt;</code>. Injecting <code style="font-family:var(--font-mono)">&lt;script&gt;alert(1)&lt;/script&gt;</code> directly here would just become text content of the title — it won't execute.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 08</span><span class="step-title">Close the Title Tag Before Injecting</span></div>
+        <div class="step-desc">Replace <code style="font-family:var(--font-mono);color:var(--accent)">a</code> with a payload that first closes <code style="font-family:var(--font-mono)">&lt;/title&gt;</code> before adding the script:</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">modified request</span></div>
+          <pre>GET /reflected/parameter/title?q=<span class="val">&lt;/title&gt;&lt;script&gt;alert(1)&lt;/script&gt;</span> HTTP/2</pre>
+        </div>
+        <div class="step-desc">Send it, copy the URL, turn off intercept, and open the URL in a new tab — the alert fires, confirming the title context was successfully escaped.</div>
+        <div class="callout orange">
+          <strong>// CONTEXT MATTERS</strong>
+          The same payload doesn't work everywhere. A payload that succeeds inside a body parameter can fail silently inside a title, an HTML attribute, or a script block. Knowing exactly where the input lands in the response is the difference between a working exploit and a dead end.
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 4: COMMENT + TAG FILTER BYPASS -->
+    <section id="comment-tag">
+      <div class="section-banner">
+        <span class="section-banner-icon">🧩</span>
+        <div>
+          <div class="section-banner-label">// Part 4 of 4</div>
+          <div class="section-banner-title">HTML Comment & Tag-Based Filter Bypass</div>
+          <div class="section-banner-desc">Two more contexts: breaking out of an HTML comment, and getting around a tag-based input filter using an SVG element with an inline event handler.</div>
+        </div>
+      </div>
+
+      <h3>HTML Comment Context</h3>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 09</span><span class="step-title">Escape the HTML Comment</span></div>
+        <div class="step-desc">On the Reflected XSS page, intercept <strong>Parameter – Body HTML comment</strong>. Send to Repeater and click Send.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">response (excerpt)</span></div>
+          <pre>&lt;body&gt;
+  &lt;!-- a --&gt;
+&lt;/body&gt;</pre>
+        </div>
+        <div class="step-desc">Anything inside <code style="font-family:var(--font-mono)">&lt;!-- --&gt;</code> is ignored by the browser. To break out, close the comment with <code style="font-family:var(--font-mono);color:var(--accent)">--&gt;</code> before the script:</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">modified request</span></div>
+          <pre>GET /tags/multiline?q=<span class="val">--&gt;&lt;script&gt;alert(1)&lt;/script&gt;</span> HTTP/2</pre>
+        </div>
+        <div class="step-desc">Send, copy the URL, turn off intercept, and paste into a new tab — the comment is closed, the script runs, and the alert pops.</div>
+      </div>
+
+      <h3>Tag-Based Filter Bypass</h3>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 10</span><span class="step-title">Trigger the Tag Filter</span></div>
+        <div class="step-desc">Return to the Firing Range home page, click <strong>Tag Based XSS</strong>, turn intercept on, and click <strong>Multiline Tag</strong>. Send the request to Repeater and click Send — the response looks similar to the body parameter case from Part 2.</div>
+        <div class="step-desc">Try replacing <code style="font-family:var(--font-mono);color:var(--accent)">a</code> with <code style="font-family:var(--font-mono);color:var(--accent)">&lt;script&gt;alert(1)&lt;/script&gt;</code> and send — this time the server returns a 400.</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">error response</span></div>
+          <pre>HTTP/2 400 Bad Request
+&lt;h1&gt;Error: Invalid input, contains tags.&lt;/h1&gt;</pre>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header"><span class="step-badge">Step 11</span><span class="step-title">Bypass with an SVG Event Handler</span></div>
+        <div class="step-desc">The filter blocks complete <code style="font-family:var(--font-mono)">&lt;tag&gt;</code> patterns but doesn't catch a lone opening <code style="font-family:var(--font-mono)">&lt;</code>. An SVG element with an inline <code style="font-family:var(--font-mono)">onload</code> handler doesn't need the same closing structure — using <code style="font-family:var(--font-mono)">%20</code> (URL-encoded space) keeps it from matching the filter's pattern:</div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">filter bypass payload</span></div>
+          <pre>GET /tags/multiline?q=<span class="val">&lt;svg/onload=alert(1)%20</span> HTTP/2</pre>
+        </div>
+        <div class="step-desc">Send the request — it returns 200 OK, with the SVG and its <code style="font-family:var(--font-mono)">onload</code> handler intact in the response body. Copy the URL, disable intercept, and open it in a new tab — the alert fires.</div>
+        <div class="callout red">
+          <strong>// INCOMPLETE FILTERING IS DANGEROUS</strong>
+          The server blocked <code style="font-family:var(--font-mono)">&lt;tag&gt;</code> patterns but forgot standalone <code style="font-family:var(--font-mono)">&lt;</code> characters. Blocklist-based filters fail like this constantly — there are too many ways to construct an XSS payload to enumerate them all. The fix isn't a smarter blocklist; it's HTML entity-encoding all user-supplied output at the point it's rendered, regardless of what characters it contains.
+        </div>
+      </div>
+    </section>
+
+    <!-- SUMMARY -->
+    <section id="summary">
+      <span class="step-num">// Summary</span>
+      <h2>Lab Summary</h2>
+      <p>This lab walked through discovering and exploiting Reflected XSS across four different HTML injection contexts using Burp Suite as an intercepting proxy. Each context required a different payload — proof that effective XSS testing (and defense) depends on understanding exactly where untrusted input lands in the rendered HTML.</p>
+
+      <table class="comp-table">
+        <thead><tr><th>Context</th><th>Payload</th><th>Why It Works</th></tr></thead>
+        <tbody>
+          <tr><td>Body Parameter</td><td>&lt;script&gt;alert(1)&lt;/script&gt;</td><td>Reflected directly into the body — no encoding, no context to escape</td></tr>
+          <tr><td>Title Tag</td><td>&lt;/title&gt;&lt;script&gt;alert(1)&lt;/script&gt;</td><td>Must close &lt;title&gt; first to reach an executable script context</td></tr>
+          <tr><td>HTML Comment</td><td>--&gt;&lt;script&gt;alert(1)&lt;/script&gt;</td><td>Must close the comment block before the script tag is parsed as HTML</td></tr>
+          <tr><td>Tag Filter Bypass</td><td>&lt;svg/onload=alert(1)%20</td><td>Filter blocked full &lt;tag&gt; pairs but missed a lone opening &lt;</td></tr>
+        </tbody>
+      </table>
+
+      <div class="summary-card">
+        <h3>// Defensive Takeaways</h3>
+        <ul class="cmd-list">
+          <li><span class="cmd-name">Output encoding</span><span class="cmd-desc">Convert &lt;, &gt;, &amp;, ", and ' to their HTML entity equivalents before rendering any user-supplied data</span></li>
+          <li><span class="cmd-name">Context-aware encoding</span><span class="cmd-desc">Apply different encoding rules depending on whether output lands in HTML body, an attribute, or a script block</span></li>
+          <li><span class="cmd-name">Avoid blocklists</span><span class="cmd-desc">Pattern-matching against "known bad" tags is brittle — the SVG bypass shows how easily it's defeated</span></li>
+          <li><span class="cmd-name">Content Security Policy</span><span class="cmd-desc">A strict CSP blocks inline script execution even if encoding fails somewhere</span></li>
+        </ul>
+      </div>
+
+      <div class="callout" style="margin-top:1.25rem;">
+        <strong>// SKILLS DEMONSTRATED</strong>
+        Burp Suite proxy configuration · FoxyProxy & CA certificate setup · HTTP request interception and modification · Reflected XSS exploitation · HTML context analysis · Parameter and tag escaping · Input filter bypass techniques · Output encoding and CSP awareness
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Web Application Security Lab · Cybersecurity Portfolio</p>
+</footer>
+<button class="scroll-top" id="scrollTop">↑</button>
+
+<script>
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // Active TOC highlight
+  const links = document.querySelectorAll('.toc a');
+  const sections = document.querySelectorAll('.content section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.style.color = '');
+        const a = document.querySelector('.toc a[href="#' + e.target.id + '"]');
+        if (a) { a.style.color = 'var(--accent)'; a.style.borderLeftColor = 'var(--accent)'; }
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
