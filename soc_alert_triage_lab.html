@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rizuanul Haque — SOC L1 Alert Triage Lab</title>
+<meta name="description" content="Hands-on SOC alert triage lab: prioritizing, investigating, and closing security alerts using a defender-first methodology.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2215%22 fill=%22%230d1117%22/><text y=%22.9em%22 font-size=%2260%22 x=%2250%25%22 text-anchor=%22middle%22 fill=%22%2300d4ff%22 font-family=%22Arial%22 font-weight=%22bold%22>RH</text></svg>">
+<meta property="og:image" content="https://rizuanul90.github.io/profile.png">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* ===== Lab page layout (matches proj-card / tag conventions from projects.html) ===== */
+  .lab-wrap {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 3rem;
+  }
+  @media (max-width: 860px) {
+    .lab-wrap { grid-template-columns: 1fr; }
+    .lab-toc { display: none; }
+  }
+
+  .lab-toc {
+    position: sticky;
+    top: 100px;
+    align-self: start;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .lab-toc-label {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+    margin-bottom: 14px;
+  }
+  .lab-toc ul { list-style: none; border-left: 1px solid var(--border); padding: 0; margin: 0; }
+  .lab-toc li a {
+    display: block;
+    color: var(--muted);
+    padding: 7px 0 7px 16px;
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+    text-decoration: none;
+  }
+  .lab-toc li a:hover { color: var(--accent); border-left-color: var(--accent); }
+
+  .lab-meta-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.25rem 0 2.5rem; }
+  .lab-pill {
+    font-family: var(--font-mono); font-size: 0.72rem; padding: 5px 14px;
+    border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: transparent;
+  }
+  .lab-pill.complete { color: var(--accent2); border-color: var(--accent2); background: #1a3328; }
+
+  .lab-section { margin-bottom: 3rem; scroll-margin-top: 90px; }
+  .lab-section h2 {
+    font-size: 1.3rem; margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border);
+  }
+  .lab-section h2 .num { font-family: var(--font-mono); color: var(--accent); margin-right: 8px; font-size: 0.95rem; }
+  .lab-section h3 { font-size: 1.05rem; margin: 1.5rem 0 0.75rem; }
+  .lab-section p { color: var(--muted); line-height: 1.7; margin-bottom: 0.9rem; }
+  .lab-section p strong, .lab-section li strong { color: var(--text); }
+  .lab-section ul.bullets, .lab-section ol.steps { color: var(--muted); padding-left: 1.3rem; margin-bottom: 1rem; }
+  .lab-section ul.bullets li, .lab-section ol.steps li { margin-bottom: 0.5rem; line-height: 1.65; }
+
+  .lab-callout {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1.25rem 0;
+  }
+  .lab-callout .label {
+    font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--accent); display: block; margin-bottom: 0.4rem;
+  }
+  .lab-callout p:last-child { margin-bottom: 0; }
+
+  .alert-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.4rem 1.5rem; margin: 1.25rem 0 1.75rem;
+  }
+  .alert-card-head {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
+    margin-bottom: 0.9rem; flex-wrap: wrap;
+  }
+  .alert-name { font-family: var(--font-mono); font-size: 0.95rem; color: var(--text); }
+  .sev { font-family: var(--font-mono); font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .sev.critical { background: #3a1a22; color: #ff6b81; border: 1px solid #ff6b81; }
+  .sev.high { background: #3a2a1a; color: #ffb84d; border: 1px solid #ffb84d; }
+  .sev.medium { background: #1a3328; color: var(--accent2); border: 1px solid var(--accent2); }
+
+  .field-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.6rem 1.2rem; font-family: var(--font-mono); font-size: 0.78rem;
+    margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+  }
+  .field-grid .k { color: var(--muted); display: block; }
+  .field-grid .v { color: var(--text); }
+
+  .verdict-row { display: flex; align-items: center; gap: 0.6rem; margin-top: 1rem; font-family: var(--font-mono); font-size: 0.82rem; flex-wrap: wrap; }
+  .verdict-badge { padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+  .verdict-badge.tp { background: #3a1a22; color: #ff6b81; border: 1px solid #ff6b81; }
+  .verdict-badge.fp { background: #1a3328; color: var(--accent2); border: 1px solid var(--accent2); }
+
+  .lab-table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.9rem; }
+  .lab-table th, .lab-table td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border); }
+  .lab-table th { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .lab-table td { color: var(--muted); }
+  .lab-table td strong { color: var(--text); }
+
+  .lab-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.5rem 0; }
+
+  .lab-footer-nav {
+    display: flex; justify-content: space-between; margin-top: 3.5rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.85rem;
+  }
+  .lab-footer-nav a { color: var(--accent); text-decoration: none; }
+  .lab-footer-nav a:hover { text-decoration: underline; }
+</style>
+  <script src="particles.js" defer></script>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="experience.html">Experience</a></li>
+    <li><a href="projects.html" class="active">Projects</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="internship.html">Internship</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-avail"><span class="nav-avail-dot"></span>Available</div>
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="lab-wrap">
+
+    <aside class="lab-toc">
+      <div class="lab-toc-label">On this page</div>
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#approach">Triage Approach</a></li>
+        <li><a href="#prioritization">Prioritization</a></li>
+        <li><a href="#alert-1">Alert 1 — VPN Login</a></li>
+        <li><a href="#alert-2">Alert 2 — Mimikatz</a></li>
+        <li><a href="#alert-3">Alert 3 — Phishing</a></li>
+        <li><a href="#why-it-matters">Why This Matters</a></li>
+        <li><a href="#takeaways">Key Takeaways</a></li>
+      </ul>
+    </aside>
+
+    <div>
+      <p class="section-label">SOC // Alert Triage</p>
+      <h2>SOC L1 Alert Triage</h2>
+      <p style="color: var(--muted); max-width: 680px; margin-top: 0.75rem;">
+        A hands-on lab in reviewing, prioritizing, and resolving security alerts the way a first-line SOC analyst
+        does — working through a live alert queue, deciding what to investigate first, and closing each case with
+        a documented verdict.
+      </p>
+
+      <div class="lab-meta-row">
+        <span class="lab-pill complete">✓ Complete</span>
+        <span class="lab-pill">TryHackMe — Premium Room</span>
+        <span class="lab-pill">SOC Dashboard / SIEM</span>
+        <span class="lab-pill">Alert Triage</span>
+        <span class="lab-pill">~60 min</span>
+      </div>
+
+      <section class="lab-section" id="overview">
+        <h2><span class="num">01</span>Overview</h2>
+        <p>
+          This lab simulates a real SOC alert queue: a dashboard full of alerts moving between
+          <strong>New</strong>, <strong>In Progress</strong>, and <strong>Closed</strong> states, each with its own
+          severity, status, and description. The goal isn't to clear the queue — it's to build a repeatable process
+          for deciding what to look at first, how to investigate it properly, and how to close it with a defensible
+          verdict.
+        </p>
+        <p>
+          I went in treating this less like a checklist and more like the job itself: every alert is either noise
+          that's wasting analyst time, or the first sign of an attacker who's already inside. The job of an L1
+          analyst is to tell the difference quickly and correctly, every single time.
+        </p>
+      </section>
+
+      <section class="lab-section" id="approach">
+        <h2><span class="num">02</span>Triage Approach</h2>
+        <p>
+          Before touching any individual alert, I worked through the lifecycle every alert moves through on its way
+          from raw log to closed case:
+        </p>
+        <ol class="steps">
+          <li><strong>Event generation</strong> — a login, a process launch, a file download, something happens on an endpoint, network device, or cloud service.</li>
+          <li><strong>Log shipping</strong> — that event gets forwarded into a centralized SIEM or EDR platform.</li>
+          <li><strong>Detection logic fires</strong> — a correlation rule matches the event and an alert is generated, with a name, severity, and description attached.</li>
+          <li><strong>Triage</strong> — an analyst (me, in this case) picks up the alert, investigates it, and assigns a verdict.</li>
+          <li><strong>Resolution</strong> — the alert is closed as a true positive (real threat, escalate) or false positive (benign, document and move on).</li>
+        </ol>
+        <p>
+          The reason this matters: a SOC doesn't fail because nobody saw the alert. It fails because the alert sat
+          in the queue too long, or got triaged by someone who didn't understand what it was actually telling them.
+        </p>
+      </section>
+
+      <section class="lab-section" id="prioritization">
+        <h2><span class="num">03</span>Prioritization — Choosing What to Work First</h2>
+        <p>
+          With dozens of alerts sitting in the queue, the first real decision isn't "how do I investigate this," it's
+          "which one do I investigate first." I used a three-pass filter to pick:
+        </p>
+        <ul class="bullets">
+          <li><strong>Filter out anything already owned.</strong> If another analyst already assigned themselves or it's mid-investigation, it's not mine to take.</li>
+          <li><strong>Sort by severity first.</strong> Critical and high-severity alerts get worked before medium or low — detection rules are tuned so the highest severities carry the highest real-world risk.</li>
+          <li><strong>Sort by age second.</strong> Between two alerts of equal severity, the older one wins. An attacker who breached a host an hour ago has had an hour longer to move laterally, exfiltrate data, or establish persistence than one who just tripped a rule a minute ago.</li>
+        </ul>
+        <div class="lab-callout">
+          <span class="label">Defender's note</span>
+          <p>
+            This is also why a SOC's mean-time-to-triage (MTTT) metric matters more than raw alert volume. A queue
+            with 200 low-priority alerts and one missed critical alert is a worse outcome than a queue with 50
+            alerts that all got worked in the right order.
+          </p>
+        </div>
+      </section>
+
+      <section class="lab-section">
+        <h2><span class="num">04</span>Working the Queue</h2>
+        <p>
+          Three representative alerts from the queue, each handled through the same investigate → decide → close
+          cycle. Exact dashboard data, screenshots, and submission flags are intentionally omitted here in favor of
+          the actual analytical reasoning — that's the part that's reusable on the job and the part a portfolio
+          should actually show.
+        </p>
+
+        <div id="alert-1">
+          <h3>Alert 1 — Unusual VPN Login Location</h3>
+          <div class="alert-card">
+            <div class="alert-card-head">
+              <span class="alert-name">Unusual VPN Login Location</span>
+              <span class="sev high">High</span>
+            </div>
+            <div class="field-grid">
+              <div><span class="k">Affected User</span><span class="v">Service account, finance dept.</span></div>
+              <div><span class="k">Source</span><span class="v">VPN gateway logs</span></div>
+              <div><span class="k">Trigger</span><span class="v">Login from geolocation inconsistent with user's normal pattern</span></div>
+              <div><span class="k">Status</span><span class="v">New → In Progress</span></div>
+            </div>
+            <p><strong>Investigation:</strong> I checked whether the account had any recent travel notice or VPN exception on file (none), then looked at the login's surrounding context: time of day relative to the user's normal working hours, whether MFA was satisfied, and whether the same session showed any unusual follow-on activity (file access, privilege use). A login from an unexpected location on a service account — which shouldn't be logging in interactively from anywhere — is a much stronger signal than the same anomaly on a human user who travels.</p>
+            <p><strong>Reasoning:</strong> Service accounts are high-value targets precisely because nobody expects to see "unusual" behavior questioned as often as a human's — they're often over-permissioned and under-monitored. Treating the alert with extra weight because of <em>who</em> triggered it, not just <em>what</em> triggered it, is part of accurate triage.</p>
+            <div class="verdict-row">
+              <span class="verdict-badge tp">Verdict: True Positive</span>
+              <span style="color: var(--muted);">Escalated to L2 for credential rotation and session review</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="alert-2">
+          <h3>Alert 2 — Unapproved Mimikatz Usage</h3>
+          <div class="alert-card">
+            <div class="alert-card-head">
+              <span class="alert-name">Unapproved Mimikatz Usage</span>
+              <span class="sev critical">Critical</span>
+            </div>
+            <div class="field-grid">
+              <div><span class="k">Affected Host</span><span class="v">Domain-joined workstation</span></div>
+              <div><span class="k">Source</span><span class="v">EDR process telemetry</span></div>
+              <div><span class="k">Trigger</span><span class="v">Known credential-dumping tool signature detected in process tree</span></div>
+              <div><span class="k">Status</span><span class="v">New → In Progress</span></div>
+            </div>
+            <p><strong>Investigation:</strong> Mimikatz has almost no legitimate enterprise use case outside of authorized red team engagements, so the first thing I checked was whether this host was in scope for any scheduled penetration test or purple team exercise. It wasn't. From there I looked at the parent process that spawned it, the logged-on user context, and whether the process actually executed or was blocked/quarantined by the EDR before it could touch LSASS memory.</p>
+            <p><strong>Reasoning:</strong> Severity and verdict aren't the same decision. This one was correctly flagged Critical by the detection rule regardless of outcome — the <em>tool itself</em> is the risk signal. But whether it's a true positive still depends on execution context: a blocked, quarantined Mimikatz binary that never ran is a very different outcome than one that successfully dumped credentials and now has a live attacker with valid domain creds.</p>
+            <div class="verdict-row">
+              <span class="verdict-badge tp">Verdict: True Positive</span>
+              <span style="color: var(--muted);">Escalated immediately — credential compromise scope assessment</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="alert-3">
+          <h3>Alert 3 — Email Marked as Phishing</h3>
+          <div class="alert-card">
+            <div class="alert-card-head">
+              <span class="alert-name">Email Marked as Phishing</span>
+              <span class="sev medium">Medium</span>
+            </div>
+            <div class="field-grid">
+              <div><span class="k">Affected User</span><span class="v">General staff mailbox</span></div>
+              <div><span class="k">Source</span><span class="v">User-reported / mail gateway flag</span></div>
+              <div><span class="k">Trigger</span><span class="v">Inbound email reported by recipient, gateway confidence: medium</span></div>
+              <div><span class="k">Status</span><span class="v">New → In Progress</span></div>
+            </div>
+            <p><strong>Investigation:</strong> This is the highest-volume, lowest-signal alert type most SOCs deal with, so the workflow has to be fast without being careless. I checked the sender domain against known-good corporate domains, looked at whether the email contained a link or attachment, and — if a link was present — whether it pointed to a credential-harvesting page or a benign marketing redirect. I also checked whether other users had received the same message, which would indicate a broader campaign rather than a one-off.</p>
+            <p><strong>Reasoning:</strong> Most alerts in this category resolve as false positives — marketing emails, internal newsletters a user didn't recognize, legitimate vendor correspondence with an unusual sender display name. The discipline here isn't suspicion, it's consistency: every alert gets the same minimum verification regardless of how "obviously fine" it looks, because that's exactly the category attackers try to blend into.</p>
+            <div class="verdict-row">
+              <span class="verdict-badge fp">Verdict: False Positive</span>
+              <span style="color: var(--muted);">Documented and closed — legitimate vendor email, flagged on sender mismatch</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lab-section" id="why-it-matters">
+        <h2><span class="num">05</span>Why This Matters (Defender Perspective)</h2>
+        <p>
+          It would be easy to read this lab as "click through some alerts and get the right answer." The actual
+          skill being built is judgment under volume and ambiguity — the same judgment that determines whether a
+          real breach gets caught in minutes or sits unnoticed for weeks.
+        </p>
+        <table class="lab-table">
+          <thead>
+            <tr><th>Failure Mode</th><th>Real-World Consequence</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Wrong prioritization</strong></td><td>A critical alert sits behind ten low-severity ones; attacker dwell time increases</td></tr>
+            <tr><td><strong>Shallow investigation</strong></td><td>A true positive gets closed as false positive on a surface-level look — the most dangerous outcome in this lab</td></tr>
+            <tr><td><strong>Alert fatigue</strong></td><td>High false-positive volume on rules like phishing reports causes analysts to rubber-stamp closures</td></tr>
+            <tr><td><strong>No documentation</strong></td><td>Verdict without reasoning means L2 can't trust or audit the L1 decision, and patterns across alerts go unnoticed</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="lab-section" id="takeaways">
+        <h2><span class="num">06</span>Key Takeaways</h2>
+        <ul class="bullets">
+          <li>Severity is set by the detection rule; verdict is set by the analyst — the two are independent decisions and conflating them leads to either over-escalation or missed threats.</li>
+          <li>Who or what triggered the alert changes how much scrutiny it deserves, even when the technical signature looks identical (a service account vs. a human user, for example).</li>
+          <li>Prioritization by severity-then-age isn't just a process rule — it directly maps to limiting attacker dwell time, which is one of the metrics that matters most to a SOC's actual effectiveness.</li>
+          <li>The highest-volume alert categories (phishing reports, login anomalies) are also where consistency matters most, because that's where fatigue-driven shortcuts do the most damage.</li>
+          <li>A closed alert without a documented reasoning trail is functionally unverifiable — writing the "why" is part of the job, not an extra step.</li>
+        </ul>
+
+        <div class="lab-tags">
+          <span class="tag">SOC</span>
+          <span class="tag">Alert Triage</span>
+          <span class="tag">SIEM</span>
+          <span class="tag">Incident Prioritization</span>
+          <span class="tag">Blue Team</span>
+          <span class="tag green">TryHackMe</span>
+        </div>
+      </section>
+
+      <div class="lab-footer-nav">
+        <a href="wazuh_lab.html">← Wazuh Administration Lab</a>
+        <a href="projects.html">All Projects →</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Cybersecurity Portfolio</p>
+</footer>
+<button class="scroll-top" id="scrollTop">↑</button>
+<script>
+  const btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', () => { document.body.classList.toggle('light'); btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️'; });
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
