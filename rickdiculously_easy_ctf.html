@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rickdiculously Easy — CTF Walkthrough | Rizuanul Haque</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2215%22 fill=%22%230d1117%22/><text y=%22.9em%22 font-size=%2260%22 x=%2250%25%22 text-anchor=%22middle%22 fill=%22%2300d4ff%22 font-family=%22Arial%22 font-weight=%22bold%22>RH</text></svg>">
+<link rel="stylesheet" href="style.css">
+<style>
+  .lab-hero { margin-bottom: 2rem; }
+  .lab-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0 1.25rem; }
+  .lab-meta span {
+    font-family: var(--font-mono); font-size: 0.72rem; padding: 4px 12px;
+    border-radius: 20px; border: 1px solid var(--border); color: var(--muted);
+  }
+  .lab-score {
+    display: inline-block; margin-top: 0.5rem; font-family: var(--font-mono);
+    font-size: 0.85rem; color: var(--accent2); border: 1px solid var(--accent2);
+    background: #1a3328; padding: 6px 16px; border-radius: 20px;
+  }
+  .lab-content h2 {
+    font-family: var(--font-head); font-size: 1.25rem; margin: 2.5rem 0 0.9rem;
+    color: var(--fg); border-left: 3px solid var(--accent); padding-left: 0.75rem;
+  }
+  .lab-content p { font-size: 0.92rem; line-height: 1.75; color: var(--muted); margin-bottom: 1rem; }
+  .lab-content ul { margin: 0.5rem 0 1.2rem 1.2rem; }
+  .lab-content li { font-size: 0.9rem; line-height: 1.7; color: var(--muted); margin-bottom: 0.3rem; }
+  .lab-content code { font-family: var(--font-mono); font-size: 0.82rem; }
+
+  .term {
+    background: #0d1117; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 0.9rem 1.1rem; margin: 0.5rem 0 1.3rem; overflow-x: auto;
+  }
+  .term pre { margin: 0; font-family: var(--font-mono); font-size: 0.8rem; color: #c9d1d9; line-height: 1.6; }
+  .term .prompt { color: #00d4ff; }
+
+  .flagbox {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+    background: #1a3328; border: 1px solid var(--accent2); border-radius: var(--radius);
+    padding: 0.8rem 1.2rem; margin: 0.9rem 0 1.5rem;
+  }
+  .flagbox code { color: var(--accent2); font-weight: 700; font-size: 0.88rem; }
+  .flagbox .pts { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); font-style: italic; }
+
+  .fig { margin: 1rem 0 1.6rem; text-align: center; }
+  .fig img {
+    max-width: 100%; border-radius: var(--radius); border: 1px solid var(--border);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  }
+  .fig figcaption { margin-top: 0.6rem; font-size: 0.78rem; color: var(--muted); font-style: italic; }
+
+  .summary-box {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.3rem 1.5rem; margin-top: 2rem;
+  }
+  .summary-box h3 { font-family: var(--font-head); font-size: 1rem; margin-bottom: 0.6rem; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono);
+    font-size: 0.78rem; color: var(--accent); text-decoration: none; margin-bottom: 1.5rem;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">RH</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="experience.html">Experience</a></li>
+    <li><a href="projects.html" class="active">Projects</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="internship.html">Internship</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-avail"><span class="nav-avail-dot"></span>Available</div>
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<main class="page">
+  <a href="projects.html" class="back-link">← Back to Projects</a>
+
+  <div class="lab-hero">
+    <p class="section-label">Lab Write-up</p>
+    <h2>Rickdiculously Easy — CTF Walkthrough</h2>
+    <div class="lab-meta">
+      <span>VulnHub Boot2Root</span>
+      <span>Nmap</span>
+      <span>Metasploit</span>
+      <span>Command Injection</span>
+      <span>Steganography</span>
+      <span>Privilege Escalation</span>
+    </div>
+    <div class="lab-score">🏁 8/8 Flags · 130/130 Points · Full Root Compromise</div>
+  </div>
+
+  <div class="lab-content">
+    <h2>Overview</h2>
+    <p>Rickdiculously Easy is a Rick and Morty-themed boot2root machine hosted on VulnHub. The objective is to enumerate the target end-to-end, collect eight hidden flags worth a combined 130 points, and escalate from an unauthenticated foothold to full root access. I ran the target as a VM on an isolated host-only network and attacked it from Kali Linux.</p>
+    <p>The biggest lesson from this box wasn't a specific exploit — it was discipline. Nearly every flag was sitting in plain sight in scan output, page source, or file metadata. The two times I lost the most time were the two times I skipped ahead to look for a CVE instead of finishing enumeration first.</p>
+
+    <h2>1. Reconnaissance</h2>
+    <p>I started with an ARP scan to confirm the target was reachable on the host-only network, then ran a full TCP port sweep with service and version detection.</p>
+    <figure class="fig">
+      <img src="rick_ctf_assets/01-arp-scan.png" alt="ARP scan confirming the target host">
+      <figcaption>ARP scan confirming the target host.</figcaption>
+    </figure>
+    <div class="term"><pre><span class="prompt">$</span> nmap -T4 -p- -A 192.168.8.85</pre></div>
+    <p>The scan returned seven open ports, and the banners alone gave up more than half the challenge:</p>
+    <ul>
+      <li><strong>21/tcp</strong> — vsftpd 3.0.3, anonymous FTP login allowed, with a FLAG.txt visible in the listing</li>
+      <li><strong>22/tcp</strong> — an SSH-like service fingerprinted as Ubuntu 14.04.5 (a red herring)</li>
+      <li><strong>80/tcp</strong> — Apache 2.4.27 on Fedora, hosting "Morty's Website"</li>
+      <li><strong>9090/tcp</strong> — Cockpit web service</li>
+      <li><strong>13337/tcp</strong> — an unrecognized service whose banner was itself a flag</li>
+      <li><strong>22222/tcp</strong> — genuine OpenSSH 7.5</li>
+      <li><strong>60000/tcp</strong> — an unrecognized service describing itself as "Rick's half baked reverse shell"</li>
+    </ul>
+    <p>Port 13337 returned its banner in plaintext, which turned out to be the first flag outright:</p>
+    <div class="flagbox"><code>FLAG:{TheyFoundMyBackDoorMorty}</code><span class="pts">10 points</span></div>
+
+    <h2>2. The "Half-Baked" Reverse Shell</h2>
+    <p>The nmap banner on port 60000 explicitly described itself as a reverse shell, so I connected to it directly with netcat rather than treating it as a normal open port.</p>
+    <div class="term"><pre><span class="prompt">$</span> nc 192.168.8.85 60000</pre></div>
+    <figure class="fig">
+      <img src="rick_ctf_assets/02-netcat-flag2.png" alt="Netcat connection revealing the second flag">
+      <figcaption>Connecting to the port 60000 service reveals the second flag.</figcaption>
+    </figure>
+    <div class="flagbox"><code>FLAG{Flip the pickle Morty!}</code><span class="pts">10 points</span></div>
+
+    <h2>3. Web Enumeration — Port 80</h2>
+    <p>Next I looked at the web server itself. The landing page didn't expose much on its own, so I moved to automated content and vulnerability scanning with Nikto and DirBuster.</p>
+    <figure class="fig">
+      <img src="rick_ctf_assets/03-website-landing.png" alt="Morty's Website landing page">
+      <figcaption>Morty's Website — the landing page on port 80.</figcaption>
+    </figure>
+    <p>Nikto flagged directory indexing on <code>/passwords/</code> and <code>/icons/</code>, an active TRACE method, and outdated Apache — useful context, but not an immediate way in. This is actually where I made my first mistake: I jumped straight into researching Apache 2.4.27 and OpenSSH 7.5 CVEs and default-credential lists before finishing enumeration, which cost time I didn't need to spend.</p>
+    <p>DirBuster (using php/txt/html wordlists) turned up a FLAG.txt and a password.html:</p>
+    <figure class="fig">
+      <img src="rick_ctf_assets/04-dirbuster-1.png" alt="DirBuster results">
+      <figcaption>DirBuster results against the web root.</figcaption>
+    </figure>
+    <figure class="fig">
+      <img src="rick_ctf_assets/05-dirbuster-2.png" alt="DirBuster additional paths">
+      <figcaption>DirBuster — additional discovered paths.</figcaption>
+    </figure>
+    <figure class="fig">
+      <img src="rick_ctf_assets/06-flag-dirbuster.png" alt="FLAG.txt found via DirBuster">
+      <figcaption>FLAG.txt located via directory brute-forcing.</figcaption>
+    </figure>
+    <div class="flagbox"><code>FLAG{Yeah d- just don't do it.}</code><span class="pts">10 points</span></div>
+    <p>password.html didn't render anything useful in the browser, but its HTML source contained a plaintext credential:</p>
+    <figure class="fig">
+      <img src="rick_ctf_assets/07-password-html.png" alt="password.html rendered">
+      <figcaption>password.html as rendered.</figcaption>
+    </figure>
+    <figure class="fig">
+      <img src="rick_ctf_assets/08-password-source.png" alt="Password revealed in page source">
+      <figcaption>Page source revealing the password "winter".</figcaption>
+    </figure>
+    <p>I held onto that credential rather than trying it blindly — it wasn't clear yet which account it belonged to.</p>
+
+    <h2>4. FTP — Confirming the Credential</h2>
+    <p>With anonymous FTP already confirmed open in the nmap scan, I logged in and pulled the FTP-hosted FLAG.txt directly.</p>
+    <div class="term"><pre><span class="prompt">$</span> ftp 192.168.8.85
+Name: anonymous
+230 Login successful.
+ftp&gt; get FLAG.txt</pre></div>
+    <figure class="fig">
+      <img src="rick_ctf_assets/09-ftp-flag.png" alt="FLAG.txt retrieved over FTP">
+      <figcaption>FLAG.txt retrieved over anonymous FTP.</figcaption>
+    </figure>
+    <div class="flagbox"><code>FLAG{Whoa this is unexpected}</code><span class="pts">10 points</span></div>
+
+    <h2>5. robots.txt and the CGI Scripts</h2>
+    <p>Checking robots.txt on the web server pointed to two disallowed CGI scripts, which I followed directly.</p>
+    <figure class="fig">
+      <img src="rick_ctf_assets/10-robots-txt.png" alt="robots.txt entries">
+      <figcaption>robots.txt disallowed entries.</figcaption>
+    </figure>
+    <p><code>root_shell.cgi</code> returned only a decoy message in its source — a dead end, but worth ruling out.</p>
+    <figure class="fig">
+      <img src="rick_ctf_assets/11-root-shell-cgi.png" alt="root_shell.cgi output">
+      <figcaption>root_shell.cgi output.</figcaption>
+    </figure>
+    <figure class="fig">
+      <img src="rick_ctf_assets/12-root-shell-source.png" alt="root_shell.cgi source">
+      <figcaption>root_shell.cgi page source.</figcaption>
+    </figure>
+    <p><code>tracetool.cgi</code> was more interesting: appending a semicolon and a shell command to its input executed the command server-side — a classic OS command injection.</p>
+    <div class="term"><pre><span class="prompt">$</span> localhost; head /etc/passwd
+<span class="prompt">$</span> localhost; tail /etc/passwd</pre></div>
+    <figure class="fig">
+      <img src="rick_ctf_assets/13-tracetool-head.png" alt="Command injection dumping /etc/passwd head">
+      <figcaption>Command injection in tracetool.cgi dumping /etc/passwd.</figcaption>
+    </figure>
+    <figure class="fig">
+      <img src="rick_ctf_assets/14-tracetool-tail.png" alt="Command injection confirming user list">
+      <figcaption>Confirming the full user list via the same injection.</figcaption>
+    </figure>
+    <p>This didn't hand me a shell outright, but it confirmed the system's real user accounts — including Rick and Morty — which mattered a lot for the credentials I'd already collected.</p>
+
+    <h2>6. Cockpit Web Service — Port 9090</h2>
+    <p>Port 9090 hosts Cockpit's web login. The login page itself displayed the next flag without any authentication required.</p>
+    <figure class="fig">
+      <img src="rick_ctf_assets/15-cockpit-flag.png" alt="Cockpit login page exposing a flag">
+      <figcaption>Cockpit login page exposing a flag.</figcaption>
+    </figure>
+    <div class="flagbox"><code>FLAG {THERE IS NO ZEUS, IN YOUR FACE!}</code><span class="pts">10 points</span></div>
+    <p>I spent some time here trying to intercept requests with Burp Suite and reviewing page source for anything further — that didn't produce another flag, but it was good practice regardless.</p>
+
+    <h2>7. SSH Foothold</h2>
+    <p>Port 22 fingerprinted as SSH but wasn't the real service; port 22222 was the actual OpenSSH listener. With the password "winter" in hand and Rick-and-Morty naming conventions in mind, I tried the most obvious username.</p>
+    <div class="term"><pre><span class="prompt">$</span> ssh Summer@192.168.8.85 -p 22222
+Password: winter</pre></div>
+    <p>That combination worked and dropped a flag on login.</p>
+    <div class="flagbox"><code>FLAG{Get off the high road Summer!}</code><span class="pts">10 points</span></div>
+
+    <h2>8. Morty's Journal — Steganography</h2>
+    <p>From the Summer account I explored the other home directories and found two interesting files under Morty's: a password-protected journal.txt.zip and a JPEG named Safe_Password.jpg. I ran the image through an online forensic string/metadata extractor and pulled a hidden password from it.</p>
+    <figure class="fig">
+      <img src="rick_ctf_assets/16-steganography.png" alt="Forensic string extraction on image">
+      <figcaption>Forensic string extraction on Safe_Password.jpg.</figcaption>
+    </figure>
+    <div class="term"><pre>Extracted password: Meeseek</pre></div>
+    <p>That password unzipped journal.txt.zip, which contained the next flag.</p>
+    <div class="flagbox"><code>FLAG: {131333}</code><span class="pts">20 points</span></div>
+
+    <h2>9. Rick's Safe</h2>
+    <p>Morty's journal also hinted at a password for a "safe" executable found in Rick's home directory. Running the safe binary and testing candidate phrases pulled from the journal — including the flag text itself — unlocked it and produced another flag plus a clue toward the root password.</p>
+    <div class="flagbox"><code>FLAG{And Awwwaaaaayyyy we Go!}</code><span class="pts">20 points</span></div>
+
+    <h2>10. Root — Brute-Forcing the Final Password</h2>
+    <p>The clue pointed to a themed passphrase built around three words. I generated targeted wordlists with crunch based on the hint, then ran Metasploit's <code>ssh_login</code> auxiliary module against port 22222 with the RickSanchez account.</p>
+    <div class="term"><pre><span class="prompt">$</span> crunch 5 5 -t ,%The &gt; the_password.txt
+<span class="prompt">$</span> crunch 7 7 -t ,%Flesh &gt; flesh_password.txt
+<span class="prompt">$</span> crunch 10 10 -t ,%Curtains &gt; curtains_password.txt
+
+msf6 &gt; use auxiliary/scanner/ssh/ssh_login
+msf6 auxiliary(scanner/ssh/ssh_login) &gt; set RHOSTS 192.168.8.85
+msf6 auxiliary(scanner/ssh/ssh_login) &gt; set RPORT 22222
+msf6 auxiliary(scanner/ssh/ssh_login) &gt; set USERNAME RickSanchez
+msf6 auxiliary(scanner/ssh/ssh_login) &gt; set PASS_FILE curtains_password.txt
+msf6 auxiliary(scanner/ssh/ssh_login) &gt; run</pre></div>
+    <figure class="fig">
+      <img src="rick_ctf_assets/17-wordlist-gen.jpeg" alt="Wordlist generation targeting themed passphrase">
+      <figcaption>Wordlist generation targeting the themed passphrase.</figcaption>
+    </figure>
+    <figure class="fig">
+      <img src="rick_ctf_assets/18-msf-ssh-login.png" alt="Metasploit ssh_login module configuration">
+      <figcaption>Metasploit ssh_login module configuration.</figcaption>
+    </figure>
+    <p>The brute force eventually returned a valid credential for RickSanchez. From there, <code>sudo su</code> (using the same password) escalated straight to root, where the final flag was waiting in <code>/root/FLAG.txt</code>.</p>
+    <div class="term"><pre><span class="prompt">$</span> ssh RickSanchez@192.168.8.85 -p 22222
+[RickSanchez@localhost ~]$ sudo su
+[root@localhost ~]# cat FLAG.txt</pre></div>
+    <div class="flagbox"><code>FLAG: {Ionic Defibrillator}</code><span class="pts">30 points</span></div>
+
+    <div class="summary-box">
+      <h3>Summary</h3>
+      <p style="margin-bottom:0.6rem;">Final score: <strong style="color:var(--accent2);">130/130 points across 8 flags</strong>, with full root compromise of the target.</p>
+      <p style="margin-bottom:0.6rem;"><strong>Key techniques:</strong> TCP/service enumeration with Nmap, anonymous FTP access, web content discovery (Nikto/DirBuster), OS command injection via a CGI script, credential reuse across services, basic image steganography/forensics, wordlist-based SSH brute forcing with crunch and Metasploit, and privilege escalation via sudo.</p>
+      <p style="margin-bottom:0;"><strong>Takeaway:</strong> finish enumeration before chasing exploits. Both times I went looking for a CVE early, the actual answer was already sitting in output I'd already collected.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 · <a href="index.html">Rizuanul Haque</a> · Cybersecurity Portfolio</p>
+</footer>
+<button class="scroll-top" id="scrollTop">↑</button>
+<script>
+  const btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', () => { document.body.classList.toggle('light'); btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️'; });
+  const st = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 300));
+  st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
